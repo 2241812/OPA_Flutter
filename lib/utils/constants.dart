@@ -19,6 +19,10 @@ class AppConstants {
   // Onboarding
   static const String onboardingCompleteKey = 'opa_onboarding_complete';
 
+  // GitHub repository — used for update checks via Releases API
+  static const String gitHubOwner = '2241812';
+  static const String gitHubRepo = 'OPA_Flutter';
+
   // SSH defaults
   static const int defaultSshPort = 22;
   static const Duration defaultKeepAlive = Duration(seconds: 30);

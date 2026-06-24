@@ -1,71 +1,92 @@
-# OPA — OpenSSH Pocket Agent
+<div align="center">
 
-A Flutter app that makes SSH connectivity effortless — connect to your PC and other remote machines, run terminal commands, manage SSH keys, and launch/monitor AI agent processes from your phone.
+<img src="https://raw.githubusercontent.com/2241812/OPA_Flutter/main/assets/icon.png" alt="OPA Logo" width="120" height="120">
 
-Built with **Flutter**, **dartssh2** (SSH client), and **xterm.dart** (terminal emulator).
+# ⬡ OPA — OpenSSH Pocket Agent
+
+**Connect to any machine from your phone. Run terminals, manage keys, and launch agents — all in one pocket-sized app.**
+
+[![Flutter](https://img.shields.io/badge/Flutter-3.44-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
+[![Dart](https://img.shields.io/badge/Dart-3.12-0175C2?logo=dart&logoColor=white)](https://dart.dev)
+[![Platform](https://img.shields.io/badge/Platform-Android-3DDC84?logo=android&logoColor=white)](https://github.com/2241812/OPA_Flutter/releases)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
+</div>
 
 ---
 
-## ✨ What's New in v0.2
+## ✨ What's New
 
-- **🎨 Refined Dark Aesthetic** — Glassmorphism cards with frosted-glass blur, green accent glow borders, and rounded corners throughout the entire UI
-- **🚀 Onboarding Flow** — 4-slide welcome experience for first-time users covering app introduction, connection setup, SSH key generation, and quick commands
-- **🤖 Agent Presets Quick-Launch** — 20+ built-in presets for AI agents (Claude Code, opencode, aider, Gemini CLI, Codex…), dev tools (htop, lazygit, tmux, nvim…), and system commands — all with color-coded icons and one-tap launch
-- **📱 Terminal Auto-Optimization** — Font size auto-adjusts based on screen width to fit 80+ columns in portrait and 120+ in landscape; manual pinch-to-zoom is preserved
-- **🖥️ Landscape Immersive Mode** — Full-screen terminal in landscape with hidden app bar, compact keyboard bar, and immersive sticky system UI
-- **💫 Animations** — Smooth fade-in, slide-up, scale, and shimmer animations on cards, screens, and interactive elements via `flutter_animate`
-- **🔤 Google Fonts** — Inter for UI text, JetBrains Mono for the terminal emulator
+### v0.2 — Onboarding, Presets & Polish
+- 🎨 **Refined Dark Aesthetic** — Glassmorphism cards with frosted-glass blur, green accent glow borders, and rounded corners throughout
+- 🚀 **Onboarding Flow** — 4-slide welcome experience for first-time users
+- 🤖 **Agent Presets** — 20+ built-in quick-launch presets for AI agents, dev tools, and system commands
+- 📱 **Terminal Auto-Optimization** — Font auto-adjusts for 80+ cols portrait / 120+ landscape
+- 🖥️ **Landscape Immersive Mode** — Full-screen terminal with hidden app bar
+- 💫 **Animations** — Smooth fade-in, slide-up, scale, and shimmer animations everywhere
+- 🔤 **Google Fonts** — Inter for UI, JetBrains Mono for terminal
+- 🔔 **In-App Update Checker** — Automatically notifies you when a new version is available
 
 ---
 
 ## Features
 
-### Core
-- **🔌 Connection Profiles** — Save host/port/credentials for one-tap connections with per-connection color coding
-- **💻 Terminal Emulator** — Interactive shell with VT100/256-color support, scrollback, auto-fit font sizing, and mobile-friendly special keys
-- **🔐 Key Management** — Generate Ed25519 keys or import existing ones, stored in Android Keystore
-- **⚡ Quick Commands** — Save frequently-run commands for one-tap execution, or launch from 20+ built-in agent presets
-
-### Agent Presets (built-in)
-
-| Category | Presets |
-|---|---|
-| 🤖 AI Agents | Claude Code, opencode, aider, Cursor Agent, Gemini CLI, Qwen Code, Codex, Goose |
-| 🛠️ Dev Tools | htop, btop, lazygit, lazydocker, tmux, nvim, yazi |
-| ⚙️ System | neofetch, systemctl status, disk usage, recent logs, uptime |
-
-### Design
-- **Glassmorphism UI** — Frosted-glass cards with backdrop blur, colored accent bars, and subtle glow shadows
-- **Spring/fade animations** — Every screen transition and card appearance is smoothly animated
-- **Dark theme** — Deep charcoal background with terminal-inspired green accents
-- **Onboarding** — First-launch 4-slide walkthrough with Skip/Next navigation
+| Category | Highlights |
+|----------|-----------|
+| 🔌 **Connections** | Save host/port/credentials for one-tap SSH connections with per-connection color coding |
+| 💻 **Terminal** | Interactive shell with VT100/256-color, scrollback, auto-fit font, and mobile special keys |
+| 🔐 **Key Management** | Generate Ed25519 keys or import existing ones, stored in Android Keystore |
+| ⚡ **Quick Commands** | Save frequently-run commands for one-tap execution |
+| 🤖 **Agent Presets** | Claude Code, opencode, aider, Gemini CLI, Codex, htop, lazygit, tmux, nvim, and more |
 
 ---
 
-## Getting Started
+## Install
 
-### Prerequisites
+Grab the latest release APK from [GitHub Releases](https://github.com/2241812/OPA_Flutter/releases/latest).
 
-- **Flutter SDK** (latest stable, ≥3.0) — [install guide](https://docs.flutter.dev/get-started/install)
-- **Android Studio** or VS Code with the Flutter extension
-- An **Android device** (recommended) or emulator
-- A **target machine** running an SSH server (OpenSSH on Windows/Linux/macOS)
+> **Auto-updates:** OPA checks for new versions on every launch. If an update is available, you'll get a prompt to download the latest APK directly.
 
-### Install & Run
+<details>
+<summary>📦 Build from Source</summary>
 
 ```bash
-# 1. Install dependencies
+# Prerequisites: Flutter SDK ≥3.0
+
+# 1. Clone & install deps
+git clone https://github.com/2241812/OPA_Flutter.git
+cd OPA_Flutter
 flutter pub get
 
 # 2. Run on a connected device
-flutter devices        # verify your device is listed
+flutter devices
 flutter run
 
 # 3. Build a release APK
 flutter build apk --release
+# Output: build/app/outputs/flutter-apk/app-release.apk
 ```
 
-The built APK will be at `build/app/outputs/flutter-apk/app-release.apk`.
+</details>
+
+---
+
+## Screenshots
+
+<div align="center">
+  <table>
+    <tr>
+      <td><b>Home Screen</b></td>
+      <td><b>Terminal</b></td>
+      <td><b>Key Management</b></td>
+    </tr>
+    <tr>
+      <td width="33%"><i>Connection profiles & quick commands</i></td>
+      <td width="33%"><i>Full SSH terminal with auto-fit</i></td>
+      <td width="33%"><i>Generate & manage SSH keys</i></td>
+    </tr>
+  </table>
+</div>
 
 ---
 
@@ -73,86 +94,75 @@ The built APK will be at `build/app/outputs/flutter-apk/app-release.apk`.
 
 ```
 lib/
-├── main.dart                          # App entry, Hive init, SharedPreferences, theme, routing
-├── app_theme.dart                     # Refined dark theme with glassmorphism (Google Fonts)
-├── app_router.dart                    # GoRouter with onboarding guard + slide/fade transitions
+├── main.dart                          # App entry, Hive init, theme, routing
+├── app_theme.dart                     # Dark theme with glassmorphism
+├── app_router.dart                    # GoRouter with onboarding guard
 ├── models/
-│   ├── connection_profile.dart         # SSH connection profile model
-│   ├── ssh_key_pair.dart               # SSH key metadata model
-│   └── quick_command.dart              # Saved command model (with presetId support)
+│   ├── connection_profile.dart        # SSH connection profile model
+│   ├── ssh_key_pair.dart              # SSH key metadata model
+│   └── quick_command.dart             # Saved command model
 ├── services/
-│   ├── ssh_service.dart               # dartssh2 wrapper (connect/shell/exec with resize)
-│   ├── key_service.dart               # Key gen (pinenacl) + secure storage
-│   ├── onboarding_service.dart         # First-launch detection (SharedPreferences)
-│   ├── profile_storage_service.dart   # Hive persistence for profiles/commands
-│   └── hive_adapters.dart             # Manual Hive type adapters (backward-compatible)
+│   ├── ssh_service.dart               # dartssh2 wrapper
+│   ├── key_service.dart               # Key gen + secure storage
+│   ├── onboarding_service.dart        # First-launch detection
+│   ├── update_service.dart            # GitHub Releases update checker
+│   ├── profile_storage_service.dart   # Hive persistence
+│   └── hive_adapters.dart             # Manual Hive type adapters
 ├── screens/
-│   ├── home_screen.dart               # Connection list + quick commands + glassmorphism
-│   ├── onboarding_screen.dart         # 4-slide welcome flow with animations
-│   ├── terminal_screen.dart           # xterm.dart with auto-fit + landscape immersive
-│   ├── profile_editor_screen.dart     # Add/edit connections (refined styling)
-│   ├── key_management_screen.dart     # Generate/import/delete keys (glassmorphism)
-│   └── quick_commands_screen.dart     # Manage commands + agent presets quick-launch
+│   ├── home_screen.dart               # Connections list + quick commands
+│   ├── onboarding_screen.dart         # 4-slide welcome flow
+│   ├── terminal_screen.dart           # xterm.dart with auto-fit
+│   ├── profile_editor_screen.dart     # Add/edit connections
+│   ├── key_management_screen.dart     # Generate/import/delete keys
+│   └── quick_commands_screen.dart     # Manage commands + agent presets
 ├── widgets/
-│   ├── connection_card.dart           # Glassmorphism profile card with glow accent
-│   └── key_card.dart                  # Glassmorphism key card with icon container
+│   ├── connection_card.dart            # Glassmorphism profile card
+│   └── key_card.dart                   # Glassmorphism key card
 └── utils/
-    ├── constants.dart                 # App-wide constants, colors, terminal sizing
-    └── agent_presets.dart             # 20+ agent/tool preset catalog
+    ├── constants.dart                  # App-wide constants & colors
+    ├── agent_presets.dart              # 20+ agent/tool preset catalog
+    └── ssh_key_encoder.dart            # Ed25519 key encoding
 ```
 
 ---
 
 ## How to Use
 
-### 1. Onboarding (First Launch)
-- When you first open OPA, a 4-slide walkthrough introduces the app
-- Tap **Skip** to go straight to the home screen, or swipe through all slides
+### 1. First Launch
+A 4-slide onboarding walkthrough introduces the app. Tap **Skip** or swipe through.
 
 ### 2. Add a Connection
-- Tap the **+** FAB on the home screen
-- Enter your server's host, port (default 22), and username
-- Choose an authentication method:
-  - **Password** — quick and easy
-  - **Key** — more secure (generate or import a key first)
-  - **Both** — password + key
+Tap the **+** FAB → enter host, port (default 22), and username → choose auth:
+- **Password** — quick and easy
+- **Key** — more secure (generate or import a key first)
+- **Both** — password + key
 
 ### 3. Set Up Key-Based Auth
-- Go to **SSH Keys** (key icon in app bar)
-- Tap **+** → **Generate Ed25519 Key**
-- Tap the copy icon on the key card to copy the public key
-- On your server, append the public key to `~/.ssh/authorized_keys`:
-  ```bash
-  echo "ssh-ed25519 AAAA... opa" >> ~/.ssh/authorized_keys
-  ```
+1. Go to **SSH Keys** (key icon) → tap **+** → **Generate Ed25519 Key**
+2. Copy the public key
+3. On your server, append it to `~/.ssh/authorized_keys`:
+   ```bash
+   echo "ssh-ed25519 AAAA... opa" >> ~/.ssh/authorized_keys
+   ```
 
-### 4. Connect & Use the Terminal
+### 4. Connect & Use Terminal
 - Tap a connection card to open the terminal
-- Font size auto-adjusts to fit your screen — 80+ columns in portrait, 120+ in landscape
-- **Rotate to landscape** for immersive full-screen terminal mode
-- Use the **mobile keyboard bar** at the bottom for TAB, ESC, arrows, Ctrl+C, etc.
-- Pinch to zoom — auto-fit will respect your manual adjustment
+- Font auto-adjusts — 80+ cols portrait, 120+ landscape
+- Rotate to landscape for immersive full-screen mode
+- Use the keyboard bar for TAB, ESC, arrows, Ctrl+C
 
 ### 5. Launch Agent Presets
 - Go to **Quick Commands** (lightning icon)
-- Browse built-in presets by category (AI Agents, Dev Tools, System)
+- Browse built-in presets by category
 - Tap a preset → pick a server → command launches in terminal
-- Presets auto-save as quick commands on first use
-
-### 6. Save Custom Quick Commands
-- Go to **Quick Commands** → tap **+**
-- Save commands you run often, optionally linked to a profile
-- Example commands for AI agents:
-  ```
-  cd ~/projects/my-agent && python -m agent --start
-  tmux new -s agents
-  ```
 
 ---
 
 ## Target PC SSH Setup
 
-### Windows (OpenSSH Server)
+<details>
+<summary><b>🖥️ Windows (OpenSSH Server)</b></summary>
+
 ```powershell
 # Install OpenSSH Server (run as admin)
 Add-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0
@@ -165,7 +175,11 @@ Set-Service -Name sshd -StartupType 'Automatic'
 ipconfig
 ```
 
-### Linux / macOS
+</details>
+
+<details>
+<summary><b>🐧 Linux / macOS</b></summary>
+
 ```bash
 # Linux (Debian/Ubuntu)
 sudo apt install openssh-server
@@ -174,48 +188,53 @@ sudo systemctl enable --now ssh
 # macOS: System Settings → General → Sharing → Remote Login
 ```
 
+</details>
+
 ---
 
 ## Key Dependencies
 
 | Package | Purpose |
-|---|---|
+|---------|---------|
 | [`dartssh2`](https://pub.dev/packages/dartssh2) | SSH client (auth, shell, exec, SFTP) |
 | [`xterm`](https://pub.dev/packages/xterm) | Terminal emulator widget |
 | [`pinenacl`](https://pub.dev/packages/pinenacl) | Ed25519 key generation |
-| [`ssh_key`](https://pub.dev/packages/ssh_key) | OpenSSH key format encode/decode |
 | [`flutter_secure_storage`](https://pub.dev/packages/flutter_secure_storage) | Encrypted private key storage |
-| [`hive`](https://pub.dev/packages/hive) | Local NoSQL storage for profiles |
+| [`hive`](https://pub.dev/packages/hive) | Local NoSQL storage |
 | [`flutter_riverpod`](https://pub.dev/packages/flutter_riverpod) | State management |
 | [`go_router`](https://pub.dev/packages/go_router) | Navigation with transitions |
-| [`google_fonts`](https://pub.dev/packages/google_fonts) | Inter + JetBrains Mono fonts |
+| [`google_fonts`](https://pub.dev/packages/google_fonts) | Inter + JetBrains Mono |
 | [`flutter_animate`](https://pub.dev/packages/flutter_animate) | Declarative animations |
-| [`shared_preferences`](https://pub.dev/packages/shared_preferences) | Onboarding first-launch detection |
+| [`url_launcher`](https://pub.dev/packages/url_launcher) | Open APK download links |
 
 ---
 
-## Roadmap (Post-MVP)
+## Roadmap
 
 - [ ] SFTP file browser (upload/download/manage remote files)
 - [ ] Port forwarding UI (local/remote/dynamic SOCKS5)
 - [ ] Jump host / bastion connection chaining
-- [ ] SSH agent forwarding (requires custom implementation)
+- [ ] SSH agent forwarding
 - [ ] Session recording & replay
 - [ ] Snippet/profile import/export
 - [ ] iOS support
-- [ ] Custom preset editor (add your own agent presets)
+- [ ] Custom preset editor
 
 ---
 
 ## Security Notes
 
-- **Private keys** are stored in the device's encrypted keystore (Android Keystore / iOS Keychain) via `flutter_secure_storage`.
-- **Passwords** are stored in the local Hive database. For higher security, prefer key-based authentication.
-- All SSH connections use the system's `Socket` API directly (no web proxy).
-- The app is fully offline — no telemetry, no cloud sync.
+- **Private keys** are stored in the device's encrypted keystore (Android Keystore / iOS Keychain)
+- **Passwords** are stored in the local Hive database — prefer key-based auth for higher security
+- All SSH connections use direct socket connections (no proxy)
+- Fully offline — no telemetry, no cloud sync
 
 ---
 
+<div align="center">
+
 ## License
 
-MIT
+[MIT](LICENSE) · Built with ❤️ by [Renzo Javier](https://github.com/2241812)
+
+</div>
