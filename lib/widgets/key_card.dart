@@ -1,6 +1,11 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../models/stored_key_pair.dart';
+import '../utils/constants.dart';
 
 /// A card widget representing a stored SSH key pair.
 class KeyCard extends StatelessWidget {
@@ -20,86 +25,133 @@ class KeyCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isEd25519 = keyPair.keyType == KeyType.ed25519;
+    final accent =
+        isEd25519 ? AppConstants.primaryGreen : const Color(0xFF448AFF);
 
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            // Key type icon
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: (isEd25519
-                        ? const Color(0xFF00E676)
-                        : const Color(0xFF448AFF))
-                    .withOpacity(0.15),
-                borderRadius: BorderRadius.circular(8),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(14),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+          child: Container(
+            decoration: BoxDecoration(
+              color: AppConstants.surfaceDark.withOpacity(0.7),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.06),
               ),
-              child: Icon(
-                isEd25519 ? Icons.vpn_key : Icons.key,
-                color: isEd25519
-                    ? const Color(0xFF00E676)
-                    : const Color(0xFF448AFF),
-                size: 20,
+              boxShadow: [
+                BoxShadow(
+                  color: accent.withOpacity(0.03),
+                  blurRadius: 16,
+                  spreadRadius: 2,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: onTap,
+                borderRadius: BorderRadius.circular(14),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      // Key type icon with glow
+                      Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: accent.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: accent.withOpacity(0.2),
+                            width: 1,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: accent.withOpacity(0.15),
+                              blurRadius: 8,
+                              spreadRadius: 1,
+                            ),
+                          ],
+                        ),
+                        child: Icon(
+                          isEd25519 ? Icons.vpn_key_rounded : Icons.key_rounded,
+                          color: accent,
+                          size: 22,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      // Key info
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              keyPair.label,
+                              style: GoogleFonts.inter(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              keyPair.keyTypeLabel,
+                              style: GoogleFonts.inter(
+                                fontSize: 12,
+                                color: Colors.white.withOpacity(0.4),
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              _truncatedPublicKey(keyPair.publicKey),
+                              style: GoogleFonts.jetBrainsMono(
+                                fontSize: 10,
+                                color: Colors.white.withOpacity(0.25),
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Copy public key button
+                      IconButton(
+                        icon: Icon(
+                          Icons.copy_rounded,
+                          size: 18,
+                          color: Colors.white.withOpacity(0.4),
+                        ),
+                        tooltip: 'Copy public key',
+                        onPressed: onCopy,
+                      ),
+                      // Delete button
+                      IconButton(
+                        icon: Icon(
+                          Icons.delete_outline_rounded,
+                          size: 18,
+                          color: Colors.red.withOpacity(0.5),
+                        ),
+                        tooltip: 'Delete key',
+                        onPressed: onDelete,
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
-            const SizedBox(width: 16),
-            // Key info
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    keyPair.label,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    keyPair.keyTypeLabel,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.white.withOpacity(0.5),
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    _truncatedPublicKey(keyPair.publicKey),
-                    style: TextStyle(
-                      fontSize: 10,
-                      color: Colors.white.withOpacity(0.35),
-                      fontFamily: 'monospace',
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-            // Copy public key button
-            IconButton(
-              icon: const Icon(Icons.copy, size: 18),
-              color: Colors.white.withOpacity(0.5),
-              tooltip: 'Copy public key',
-              onPressed: onCopy,
-            ),
-            // Delete button
-            IconButton(
-              icon: const Icon(Icons.delete_outline, size: 18),
-              color: Colors.red.withOpacity(0.6),
-              tooltip: 'Delete key',
-              onPressed: onDelete,
-            ),
-          ],
+          ),
         ),
       ),
-    );
+    )
+        .animate()
+        .fadeIn(duration: 400.ms, curve: Curves.easeOut)
+        .slideY(begin: 0.05, end: 0, duration: 350.ms, curve: Curves.easeOut);
   }
 
   String _truncatedPublicKey(String key) {

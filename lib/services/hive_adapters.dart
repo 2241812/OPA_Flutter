@@ -34,8 +34,8 @@ class ConnectionProfileAdapter extends TypeAdapter<ConnectionProfile> {
       port: reader.read(),
       username: reader.read(),
       authType: AuthType.values[reader.readByte()],
-      password: reader.readNullable(),
-      keyId: reader.readNullable(),
+      password: reader.read() as String?,
+      keyId: reader.read() as String?,
       colorIndex: reader.read(),
       createdAt: DateTime.fromMillisecondsSinceEpoch(reader.readInt()),
       updatedAt: DateTime.fromMillisecondsSinceEpoch(reader.readInt()),
@@ -51,8 +51,8 @@ class ConnectionProfileAdapter extends TypeAdapter<ConnectionProfile> {
     writer.write(obj.port);
     writer.write(obj.username);
     writer.writeByte(obj.authType.index);
-    writer.writeNullable(obj.password);
-    writer.writeNullable(obj.keyId);
+    writer.write(obj.password);
+    writer.write(obj.keyId);
     writer.write(obj.colorIndex);
     writer.writeInt(obj.createdAt.millisecondsSinceEpoch);
     writer.writeInt(obj.updatedAt.millisecondsSinceEpoch);
@@ -95,13 +95,33 @@ class QuickCommandAdapter extends TypeAdapter<QuickCommand> {
 
   @override
   QuickCommand read(BinaryReader reader) {
+    final id = reader.read() as String;
+    final label = reader.read() as String;
+    final command = reader.read() as String;
+    final profileId = reader.read() as String?;
+    final colorIndex = reader.read() as int;
+    final createdAt =
+        DateTime.fromMillisecondsSinceEpoch(reader.readInt());
+
+    // presetId was added later — guard against older entries that don't
+    // contain it so existing data still deserializes cleanly.
+    String? presetId;
+    try {
+      if (reader.availableBytes > 0) {
+        presetId = reader.read() as String?;
+      }
+    } catch (_) {
+      presetId = null;
+    }
+
     return QuickCommand(
-      id: reader.read(),
-      label: reader.read(),
-      command: reader.read(),
-      profileId: reader.readNullable(),
-      colorIndex: reader.read(),
-      createdAt: DateTime.fromMillisecondsSinceEpoch(reader.readInt()),
+      id: id,
+      label: label,
+      command: command,
+      profileId: profileId,
+      colorIndex: colorIndex,
+      createdAt: createdAt,
+      presetId: presetId,
     );
   }
 
@@ -110,8 +130,9 @@ class QuickCommandAdapter extends TypeAdapter<QuickCommand> {
     writer.write(obj.id);
     writer.write(obj.label);
     writer.write(obj.command);
-    writer.writeNullable(obj.profileId);
+    writer.write(obj.profileId);
     writer.write(obj.colorIndex);
     writer.writeInt(obj.createdAt.millisecondsSinceEpoch);
+    writer.write(obj.presetId);
   }
 }

@@ -1,6 +1,10 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../models/connection_profile.dart';
 import '../models/quick_command.dart';
@@ -25,65 +29,145 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('OPA'),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 28,
+              height: 28,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppConstants.primaryGreen.withOpacity(0.1),
+                border:
+                    Border.all(color: AppConstants.primaryGreen.withOpacity(0.2)),
+              ),
+              child: const Icon(
+                Icons.terminal_rounded,
+                size: 16,
+                color: AppConstants.primaryGreen,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Text(
+              'OPA',
+              style: GoogleFonts.inter(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+                letterSpacing: 1.5,
+              ),
+            ),
+          ],
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.vpn_key),
+            icon: Icon(
+              Icons.vpn_key_rounded,
+              color: Colors.white.withOpacity(0.6),
+            ),
             tooltip: 'SSH Keys',
             onPressed: () => context.push('/keys'),
           ),
           IconButton(
-            icon: const Icon(Icons.flash_on),
+            icon: Icon(
+              Icons.flash_on_rounded,
+              color: Colors.white.withOpacity(0.6),
+            ),
             tooltip: 'Quick Commands',
             onPressed: () => context.push('/commands'),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 4),
         ],
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          setState(() {}); // Trigger rebuild to refresh list
+          setState(() {});
         },
+        color: AppConstants.primaryGreen,
         child: ListView(
-          padding: const EdgeInsets.only(top: 8, bottom: 80),
+          padding: const EdgeInsets.only(top: 8, bottom: 100),
           children: [
-            // Header
+            // ── Header section ──
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Row(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 4),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Row(
+                    children: [
+                      Text(
+                        'Your Servers',
+                        style: GoogleFonts.inter(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      )
+                          .animate()
+                          .fadeIn(
+                              duration: 400.ms, curve: Curves.easeOut)
+                          .slideX(
+                              begin: -0.05,
+                              end: 0,
+                              duration: 350.ms,
+                              curve: Curves.easeOut),
+                      const SizedBox(width: 10),
+                      if (profiles.isNotEmpty)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color:
+                                AppConstants.primaryGreen.withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: AppConstants.primaryGreen
+                                  .withOpacity(0.2),
+                            ),
+                          ),
+                          child: Text(
+                            '${profiles.length}',
+                            style: GoogleFonts.inter(
+                              fontSize: 12,
+                              color: AppConstants.primaryGreen,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        )
+                            .animate()
+                            .fadeIn(
+                                duration: 300.ms,
+                                delay: 200.ms,
+                                curve: Curves.easeOut)
+                            .scale(
+                                begin: const Offset(0.8, 0.8),
+                                duration: 300.ms,
+                                delay: 200.ms,
+                                curve: Curves.easeOutBack),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
                   Text(
-                    'Connections',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white.withOpacity(0.9),
+                    'Tap to connect to your remote machines',
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      color: Colors.white.withOpacity(0.35),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF00E676).withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      '${profiles.length}',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Color(0xFF00E676),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
+                  )
+                      .animate()
+                      .fadeIn(
+                          duration: 400.ms,
+                          delay: 100.ms,
+                          curve: Curves.easeOut),
                 ],
               ),
             ),
 
-            // Connection profiles list
+            const SizedBox(height: 12),
+
+            // ── Connection profiles list ──
             if (profiles.isEmpty)
               _buildEmptyState(
                 icon: Icons.router_outlined,
@@ -99,18 +183,44 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               ),
 
-            // Quick commands section
+            // ── Quick commands section ──
             if (commands.isNotEmpty) ...[
-              const SizedBox(height: 24),
+              const SizedBox(height: 28),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: Text(
-                  'Quick Commands',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white.withOpacity(0.9),
-                  ),
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+                child: Row(
+                  children: [
+                    Text(
+                      'Quick Commands',
+                      style: GoogleFonts.inter(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFAB40).withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: const Color(0xFFFFAB40).withOpacity(0.2),
+                        ),
+                      ),
+                      child: Text(
+                        '${commands.length}',
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: const Color(0xFFFFAB40),
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               ...commands.take(3).map(
@@ -118,12 +228,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
               if (commands.length > 3)
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20, vertical: 10),
                   child: TextButton(
                     onPressed: () => context.push('/commands'),
-                    child: Text(
-                      'View all ${commands.length} commands →',
-                      style: const TextStyle(color: Color(0xFF00E676)),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'View all ${commands.length} commands',
+                          style: GoogleFonts.inter(
+                            color: AppConstants.primaryGreen,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Icon(
+                          Icons.arrow_forward_rounded,
+                          size: 16,
+                          color: AppConstants.primaryGreen.withOpacity(0.7),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -131,10 +256,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showAddMenu,
-        tooltip: 'Add',
-        child: const Icon(Icons.add),
+      floatingActionButton: Container(
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: AppConstants.primaryGreen.withOpacity(0.25),
+              blurRadius: 16,
+              spreadRadius: 2,
+            ),
+          ],
+        ),
+        child: FloatingActionButton(
+          onPressed: _showAddMenu,
+          tooltip: 'Add',
+          child: const Icon(Icons.add_rounded),
+        ),
       ),
     );
   }
@@ -148,22 +285,36 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       padding: const EdgeInsets.all(48),
       child: Column(
         children: [
-          Icon(icon, size: 64, color: Colors.white.withOpacity(0.15)),
-          const SizedBox(height: 16),
+          Icon(
+            icon,
+            size: 64,
+            color: Colors.white.withOpacity(0.1),
+          )
+              .animate(onPlay: (c) => c.repeat())
+              .shimmer(
+                  duration: 2500.ms,
+                  color: AppConstants.primaryGreen.withOpacity(0.08))
+              .scale(
+                begin: const Offset(1, 1),
+                end: const Offset(1.02, 1.02),
+                duration: 2500.ms,
+                curve: Curves.easeInOutSine,
+              ),
+          const SizedBox(height: 20),
           Text(
             title,
-            style: TextStyle(
+            style: GoogleFonts.inter(
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: Colors.white.withOpacity(0.5),
+              color: Colors.white.withOpacity(0.45),
             ),
           ),
           const SizedBox(height: 8),
           Text(
             subtitle,
-            style: TextStyle(
+            style: GoogleFonts.inter(
               fontSize: 14,
-              color: Colors.white.withOpacity(0.35),
+              color: Colors.white.withOpacity(0.25),
             ),
             textAlign: TextAlign.center,
           ),
@@ -173,48 +324,75 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildQuickCommandChip(QuickCommand cmd) {
+    final accent = const Color(0xFFFFAB40);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 3),
-      child: InkWell(
-        onTap: () => context.push('/commands'),
-        borderRadius: BorderRadius.circular(8),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          decoration: BoxDecoration(
-            color: const Color(0xFF1A1A2E),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.06),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+          child: Container(
+            decoration: BoxDecoration(
+              color: AppConstants.surfaceDark.withOpacity(0.5),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.04),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: accent.withOpacity(0.02),
+                  blurRadius: 12,
+                ),
+              ],
             ),
-          ),
-          child: Row(
-            children: [
-              Icon(
-                Icons.flash_on,
-                size: 16,
-                color: const Color(0xFF00E676).withOpacity(0.7),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  cmd.label,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.white,
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => context.push('/commands'),
+                borderRadius: BorderRadius.circular(10),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 14, vertical: 12),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 28,
+                        height: 28,
+                        decoration: BoxDecoration(
+                          color: accent.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(7),
+                        ),
+                        child: Icon(
+                          Icons.play_arrow_rounded,
+                          size: 16,
+                          color: accent.withOpacity(0.8),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          cmd.label,
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            color: Colors.white.withOpacity(0.8),
+                            fontWeight: FontWeight.w500,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      Text(
+                        '\$ ${cmd.command}',
+                        style: GoogleFonts.jetBrainsMono(
+                          fontSize: 11,
+                          color: Colors.white.withOpacity(0.2),
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ),
-                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-              Text(
-                '\$ ${cmd.command}',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.white.withOpacity(0.3),
-                  fontFamily: 'monospace',
-                ),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -232,44 +410,125 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void _showAddMenu() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF1A1A2E),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (context) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.add_circle_outline,
-                    color: Color(0xFF00E676)),
-                title: const Text('New Connection'),
-                onTap: () {
-                  Navigator.pop(context);
-                  context.push('/profile/new');
-                },
+      backgroundColor: Colors.transparent,
+      builder: (context) => ClipRRect(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+          child: Container(
+            decoration: BoxDecoration(
+              color: AppConstants.surfaceDark.withOpacity(0.9),
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(20)),
+              border: Border(
+                top: BorderSide(
+                  color: AppConstants.primaryGreen.withOpacity(0.15),
+                  width: 1,
+                ),
+                left: BorderSide(
+                  color: Colors.white.withOpacity(0.04),
+                ),
+                right: BorderSide(
+                  color: Colors.white.withOpacity(0.04),
+                ),
               ),
-              ListTile(
-                leading: const Icon(Icons.vpn_key,
-                    color: Color(0xFF448AFF)),
-                title: const Text('Generate SSH Key'),
-                onTap: () {
-                  Navigator.pop(context);
-                  context.push('/keys');
-                },
+            ),
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Drag handle
+                    Container(
+                      width: 36,
+                      height: 4,
+                      margin: const EdgeInsets.only(bottom: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                    ListTile(
+                      leading: Container(
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          color:
+                              AppConstants.primaryGreen.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(
+                          Icons.add_circle_outline_rounded,
+                          color: AppConstants.primaryGreen,
+                          size: 20,
+                        ),
+                      ),
+                      title: Text(
+                        'New Connection',
+                        style: GoogleFonts.inter(
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      onTap: () {
+                        Navigator.pop(context);
+                        context.push('/profile/new');
+                      },
+                    ),
+                    ListTile(
+                      leading: Container(
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF448AFF).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(
+                          Icons.vpn_key_rounded,
+                          color: Color(0xFF448AFF),
+                          size: 20,
+                        ),
+                      ),
+                      title: Text(
+                        'Generate SSH Key',
+                        style: GoogleFonts.inter(
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      onTap: () {
+                        Navigator.pop(context);
+                        context.push('/keys');
+                      },
+                    ),
+                    ListTile(
+                      leading: Container(
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFAB40).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(
+                          Icons.flash_on_rounded,
+                          color: Color(0xFFFFAB40),
+                          size: 20,
+                        ),
+                      ),
+                      title: Text(
+                        'Quick Command',
+                        style: GoogleFonts.inter(
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      onTap: () {
+                        Navigator.pop(context);
+                        context.push('/commands');
+                      },
+                    ),
+                  ],
+                ),
               ),
-              ListTile(
-                leading:
-                    const Icon(Icons.flash_on, color: Color(0xFFFFAB40)),
-                title: const Text('Quick Command'),
-                onTap: () {
-                  Navigator.pop(context);
-                  context.push('/commands');
-                },
-              ),
-            ],
+            ),
           ),
         ),
       ),

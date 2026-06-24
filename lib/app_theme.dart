@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import 'utils/constants.dart';
 
 /// Dark terminal-inspired theme for OPA.
 class AppTheme {
@@ -6,97 +9,210 @@ class AppTheme {
 
   static ThemeData dark() {
     final colorScheme = ColorScheme.fromSeed(
-      seedColor: const Color(0xFF00E676), // terminal green accent
+      seedColor: AppConstants.primaryGreen,
       brightness: Brightness.dark,
-      surface: const Color(0xFF1A1A2E),
+      surface: AppConstants.surfaceDark,
+    );
+
+    // Typography — Inter for UI, JetBrains Mono for terminal/code.
+    final interTextTheme = GoogleFonts.interTextTheme(
+      Typography().white,
+    );
+    final monoTextTheme = GoogleFonts.jetBrainsMonoTextTheme(
+      Typography().white,
     );
 
     return ThemeData(
       useMaterial3: true,
       colorScheme: colorScheme,
-      scaffoldBackgroundColor: const Color(0xFF0F0F1A),
+      scaffoldBackgroundColor: AppConstants.backgroundDark,
       appBarTheme: AppBarTheme(
-        backgroundColor: const Color(0xFF1A1A2E),
+        backgroundColor: AppConstants.surfaceDark,
         foregroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        titleTextStyle: const TextStyle(
+        toolbarHeight: 52,
+        titleTextStyle: GoogleFonts.inter(
+          color: Colors.white,
+          fontSize: 17,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0.8,
+        ),
+        iconTheme: IconThemeData(color: Colors.white.withOpacity(0.8)),
+        surfaceTintColor: Colors.transparent,
+      ),
+      cardTheme: CardThemeData(
+        color: AppConstants.surfaceDark.withOpacity(0.8),
+        elevation: 2,
+        shadowColor: AppConstants.primaryGreen.withOpacity(0.05),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+          side: BorderSide(
+            color: Colors.white.withOpacity(0.06),
+          ),
+        ),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppConstants.primaryGreen,
+          foregroundColor: Colors.black,
+          elevation: 2,
+          shadowColor: AppConstants.primaryGreen.withOpacity(0.3),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          textStyle: GoogleFonts.inter(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: const Color(0xFF448AFF),
+          side: const BorderSide(color: Color(0xFF448AFF), width: 1.2),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          textStyle: GoogleFonts.inter(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: AppConstants.primaryGreen,
+          textStyle: GoogleFonts.inter(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
+        backgroundColor: AppConstants.primaryGreen,
+        foregroundColor: Colors.black,
+        elevation: 4,
+        highlightElevation: 8,
+        shape: CircleBorder(),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: AppConstants.inputFill,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(
+            color: Colors.white.withOpacity(0.08),
+          ),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(
+            color: Colors.white.withOpacity(0.08),
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(
+            color: AppConstants.primaryGreen,
+            width: 1.5,
+          ),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(
+            color: Colors.red.withOpacity(0.5),
+          ),
+        ),
+        hintStyle: GoogleFonts.inter(
+          color: Colors.white.withOpacity(0.35),
+        ),
+        labelStyle: GoogleFonts.inter(
+          color: Colors.white.withOpacity(0.5),
+          fontWeight: FontWeight.w500,
+        ),
+        prefixIconColor: Colors.white.withOpacity(0.5),
+        suffixIconColor: Colors.white.withOpacity(0.5),
+      ),
+      listTileTheme: const ListTileThemeData(
+        textColor: Colors.white,
+        iconColor: AppConstants.primaryGreen,
+      ),
+      dividerTheme: DividerThemeData(
+        color: Colors.white.withOpacity(0.06),
+        thickness: 1,
+      ),
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: AppConstants.surfaceDark,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+          side: BorderSide(
+            color: AppConstants.primaryGreen.withOpacity(0.15),
+          ),
+        ),
+        elevation: 4,
+      ),
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: AppConstants.surfaceDark.withOpacity(0.95),
+        modalBarrierColor: Colors.black54,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        elevation: 8,
+      ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: AppConstants.surfaceDark,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(
+            color: Colors.white.withOpacity(0.08),
+          ),
+        ),
+        elevation: 8,
+        titleTextStyle: GoogleFonts.inter(
           color: Colors.white,
           fontSize: 18,
           fontWeight: FontWeight.w600,
-          letterSpacing: 1.2,
+        ),
+        contentTextStyle: GoogleFonts.inter(
+          color: Colors.white.withOpacity(0.7),
+          fontSize: 14,
         ),
       ),
-      cardTheme: CardTheme(
-        color: const Color(0xFF1A1A2E),
-        elevation: 2,
+      popupMenuTheme: PopupMenuThemeData(
+        color: AppConstants.surfaceDark,
+        elevation: 6,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
           side: BorderSide(
             color: Colors.white.withOpacity(0.08),
           ),
         ),
-      ),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF00E676),
-          foregroundColor: Colors.black,
-          elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-        ),
-      ),
-      floatingActionButtonTheme: const FloatingActionButtonThemeData(
-        backgroundColor: Color(0xFF00E676),
-        foregroundColor: Colors.black,
-      ),
-      inputDecorationTheme: InputDecorationTheme(
-        filled: true,
-        fillColor: const Color(0xFF16213E),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(
-            color: Colors.white.withOpacity(0.12),
-          ),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(
-            color: Colors.white.withOpacity(0.12),
-          ),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(
-            color: Color(0xFF00E676),
-            width: 1.5,
-          ),
-        ),
-        hintStyle: TextStyle(
-          color: Colors.white.withOpacity(0.4),
-        ),
-        labelStyle: const TextStyle(
-          color: Color(0xFF00E676),
-        ),
-      ),
-      listTileTheme: const ListTileThemeData(
-        textColor: Colors.white,
-        iconColor: Color(0xFF00E676),
-      ),
-      dividerTheme: DividerThemeData(
-        color: Colors.white.withOpacity(0.08),
-        thickness: 1,
-      ),
-      // Terminal-specific text style
-      fontFamily: 'monospace',
-      textTheme: const TextTheme(
-        bodyMedium: TextStyle(
-          fontFamily: 'monospace',
-          fontSize: 14,
+        textStyle: GoogleFonts.inter(
           color: Colors.white,
+          fontSize: 14,
         ),
+      ),
+      fontFamily: 'Inter',
+      textTheme: TextTheme(
+        displayLarge: monoTextTheme.displayLarge,
+        displayMedium: monoTextTheme.displayMedium,
+        displaySmall: monoTextTheme.displaySmall,
+        headlineLarge: interTextTheme.headlineLarge,
+        headlineMedium: interTextTheme.headlineMedium,
+        headlineSmall: interTextTheme.headlineSmall,
+        titleLarge: interTextTheme.titleLarge,
+        titleMedium: interTextTheme.titleMedium,
+        titleSmall: interTextTheme.titleSmall,
+        bodyLarge: interTextTheme.bodyLarge,
+        bodyMedium: interTextTheme.bodyMedium?.copyWith(
+          color: Colors.white,
+          fontFamily: 'JetBrainsMono',
+        ),
+        bodySmall: interTextTheme.bodySmall,
+        labelLarge: interTextTheme.labelLarge,
+        labelMedium: interTextTheme.labelMedium,
+        labelSmall: interTextTheme.labelSmall,
       ),
     );
   }

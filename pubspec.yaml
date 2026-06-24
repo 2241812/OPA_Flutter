@@ -13,7 +13,7 @@ dependencies:
   dartssh2: ^2.8.0
 
   # Terminal emulator widget — VT100, 256-color, scrollback, touch
-  xterm: ^3.5.0
+  xterm: ^4.0.0
 
   # Ed25519 key pair generation (used by ssh_key_encoder.dart)
   pinenacl: ^0.6.0
@@ -33,6 +33,15 @@ dependencies:
 
   # UUID generation for unique IDs
   uuid: ^4.5.1
+
+  # Onboarding first-launch detection
+  shared_preferences: ^2.3.0
+
+  # Typography — JetBrains Mono (terminal) + Inter (UI)
+  google_fonts: ^6.2.0
+
+  # Declarative spring/fade animations
+  flutter_animate: ^4.5.0
 
 dev_dependencies:
   flutter_test:

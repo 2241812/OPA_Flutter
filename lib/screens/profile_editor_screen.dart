@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:uuid/uuid.dart';
 
 import '../models/connection_profile.dart';
@@ -43,7 +45,6 @@ class _ProfileEditorScreenState extends ConsumerState<ProfileEditorScreen> {
   void initState() {
     super.initState();
     if (_isEditing) {
-      // Load existing profile
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _loadExistingProfile();
       });
@@ -88,25 +89,31 @@ class _ProfileEditorScreenState extends ConsumerState<ProfileEditorScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_isEditing ? 'Edit Connection' : 'New Connection'),
+        title: Text(
+          _isEditing ? 'Edit Connection' : 'New Connection',
+          style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+        ),
         actions: [
           if (_isEditing)
             IconButton(
-              icon: const Icon(Icons.delete, color: Colors.red),
+              icon: const Icon(Icons.delete_outline_rounded, color: Colors.red),
               tooltip: 'Delete',
               onPressed: _deleteProfile,
             ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 4),
         ],
       ),
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
           children: [
-            // Color picker row
+            // Color picker
             _buildColorPicker(),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
+
+            _buildSectionLabel('Connection'),
+            const SizedBox(height: 12),
 
             // Label
             TextFormField(
@@ -114,12 +121,12 @@ class _ProfileEditorScreenState extends ConsumerState<ProfileEditorScreen> {
               decoration: const InputDecoration(
                 labelText: 'Label',
                 hintText: 'My PC',
-                prefixIcon: Icon(Icons.label),
+                prefixIcon: Icon(Icons.label_outline_rounded),
               ),
               textCapitalization: TextCapitalization.words,
               validator: (v) => v?.trim().isEmpty ?? true ? 'Required' : null,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
 
             // Host
             TextFormField(
@@ -127,70 +134,74 @@ class _ProfileEditorScreenState extends ConsumerState<ProfileEditorScreen> {
               decoration: const InputDecoration(
                 labelText: 'Host',
                 hintText: '192.168.1.100',
-                prefixIcon: Icon(Icons.dns),
+                prefixIcon: Icon(Icons.dns_rounded),
               ),
               keyboardType: TextInputType.text,
               validator: (v) => v?.trim().isEmpty ?? true ? 'Required' : null,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
 
-            // Port
-            TextFormField(
-              controller: _portController,
-              decoration: const InputDecoration(
-                labelText: 'Port',
-                hintText: '22',
-                prefixIcon: Icon(Icons.numbers),
-              ),
-              keyboardType: TextInputType.number,
-              validator: (v) {
-                final port = int.tryParse(v ?? '');
-                if (port == null || port < 1 || port > 65535) {
-                  return 'Invalid port (1-65535)';
-                }
-                return null;
-              },
+            // Port + Username row
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: TextFormField(
+                    controller: _portController,
+                    decoration: const InputDecoration(
+                      labelText: 'Port',
+                      hintText: '22',
+                      prefixIcon: Icon(Icons.numbers_rounded),
+                    ),
+                    keyboardType: TextInputType.number,
+                    validator: (v) {
+                      final port = int.tryParse(v ?? '');
+                      if (port == null || port < 1 || port > 65535) {
+                        return 'Invalid';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  flex: 3,
+                  child: TextFormField(
+                    controller: _usernameController,
+                    decoration: const InputDecoration(
+                      labelText: 'Username',
+                      hintText: 'root',
+                      prefixIcon: Icon(Icons.person_outline_rounded),
+                    ),
+                    validator: (v) =>
+                        v?.trim().isEmpty ?? true ? 'Required' : null,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
 
-            // Username
-            TextFormField(
-              controller: _usernameController,
-              decoration: const InputDecoration(
-                labelText: 'Username',
-                hintText: 'root',
-                prefixIcon: Icon(Icons.person),
-              ),
-              validator: (v) => v?.trim().isEmpty ?? true ? 'Required' : null,
-            ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 28),
+            _buildSectionLabel('Authentication'),
+            const SizedBox(height: 12),
 
             // Auth type selector
-            Text(
-              'Authentication',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: Colors.white.withOpacity(0.7),
-              ),
-            ),
-            const SizedBox(height: 8),
             SegmentedButton<AuthType>(
               segments: const [
                 ButtonSegment(
                   value: AuthType.password,
                   label: Text('Password'),
-                  icon: Icon(Icons.password, size: 18),
+                  icon: Icon(Icons.password_rounded, size: 16),
                 ),
                 ButtonSegment(
                   value: AuthType.publicKey,
                   label: Text('Key'),
-                  icon: Icon(Icons.vpn_key, size: 18),
+                  icon: Icon(Icons.vpn_key_rounded, size: 16),
                 ),
                 ButtonSegment(
                   value: AuthType.passwordAndPublicKey,
                   label: Text('Both'),
-                  icon: Icon(Icons.lock, size: 18),
+                  icon: Icon(Icons.lock_rounded, size: 16),
                 ),
               ],
               selected: {_authType},
@@ -200,7 +211,7 @@ class _ProfileEditorScreenState extends ConsumerState<ProfileEditorScreen> {
             ),
             const SizedBox(height: 16),
 
-            // Password field (shown for password-based auth)
+            // Password field
             if (_authType == AuthType.password ||
                 _authType == AuthType.passwordAndPublicKey)
               TextFormField(
@@ -208,12 +219,12 @@ class _ProfileEditorScreenState extends ConsumerState<ProfileEditorScreen> {
                 obscureText: _obscurePassword,
                 decoration: InputDecoration(
                   labelText: 'Password',
-                  prefixIcon: const Icon(Icons.lock),
+                  prefixIcon: const Icon(Icons.lock_outline_rounded),
                   suffixIcon: IconButton(
                     icon: Icon(
                       _obscurePassword
-                          ? Icons.visibility_off
-                          : Icons.visibility,
+                          ? Icons.visibility_off_rounded
+                          : Icons.visibility_rounded,
                     ),
                     onPressed: () =>
                         setState(() => _obscurePassword = !_obscurePassword),
@@ -221,19 +232,19 @@ class _ProfileEditorScreenState extends ConsumerState<ProfileEditorScreen> {
                 ),
               ),
 
-            // Key picker (shown for key-based auth)
+            // Key picker
             if (_authType == AuthType.publicKey ||
                 _authType == AuthType.passwordAndPublicKey) ...[
-              const SizedBox(height: 8),
+              const SizedBox(height: 14),
               DropdownButtonFormField<String>(
                 value: _selectedKeyId,
                 decoration: InputDecoration(
                   labelText: 'SSH Key',
-                  prefixIcon: const Icon(Icons.vpn_key),
+                  prefixIcon: const Icon(Icons.vpn_key_rounded),
                   suffixIcon: keys.isEmpty
                       ? null
                       : IconButton(
-                          icon: const Icon(Icons.add, size: 18),
+                          icon: const Icon(Icons.add_rounded, size: 18),
                           tooltip: 'Generate a key',
                           onPressed: () => context.push('/keys'),
                         ),
@@ -247,10 +258,12 @@ class _ProfileEditorScreenState extends ConsumerState<ProfileEditorScreen> {
                   ...keys.map(
                     (key) => DropdownMenuItem(
                       value: key.id,
-                      child: Text(key.fingerprint),
+                      child: Text(key.fingerprint,
+                          overflow: TextOverflow.ellipsis),
                     ),
                   ),
                 ],
+                isExpanded: true,
                 onChanged: (value) {
                   setState(() => _selectedKeyId = value);
                 },
@@ -260,49 +273,62 @@ class _ProfileEditorScreenState extends ConsumerState<ProfileEditorScreen> {
                   padding: const EdgeInsets.only(top: 8),
                   child: TextButton.icon(
                     onPressed: () => context.push('/keys'),
-                    icon: const Icon(Icons.add, size: 16),
+                    icon: const Icon(Icons.add_rounded, size: 16),
                     label: const Text('Generate or import a key'),
-                    style: TextButton.styleFrom(
-                      foregroundColor: const Color(0xFF00E676),
-                    ),
                   ),
                 ),
             ],
 
-            const SizedBox(height: 32),
+            const SizedBox(height: 36),
 
             // Test connection button
             OutlinedButton.icon(
               onPressed: _isTesting ? null : _testConnection,
               icon: _isTesting
                   ? const SizedBox(
-                      width: 16,
-                      height: 16,
+                      width: 18,
+                      height: 18,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : const Icon(Icons.wifi_find),
+                  : const Icon(Icons.wifi_find_rounded),
               label: Text(_isTesting ? 'Testing...' : 'Test Connection'),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: const Color(0xFF448AFF),
-                side: const BorderSide(color: Color(0xFF448AFF)),
-                padding: const EdgeInsets.symmetric(vertical: 14),
-              ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
 
             // Save button
             ElevatedButton.icon(
               onPressed: _save,
-              icon: const Icon(Icons.save),
+              icon: const Icon(Icons.save_rounded),
               label: Text(_isEditing ? 'Update' : 'Save'),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 14),
-              ),
             ),
-            const SizedBox(height: 24),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildSectionLabel(String text) {
+    return Row(
+      children: [
+        Container(
+          width: 3,
+          height: 14,
+          decoration: BoxDecoration(
+            color: AppConstants.primaryGreen,
+            borderRadius: BorderRadius.circular(2),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          text,
+          style: GoogleFonts.inter(
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+            color: Colors.white.withOpacity(0.7),
+            letterSpacing: 0.5,
+          ),
+        ),
+      ],
     );
   }
 
@@ -312,34 +338,49 @@ class _ProfileEditorScreenState extends ConsumerState<ProfileEditorScreen> {
       children: [
         Text(
           'Color',
-          style: TextStyle(
-            fontSize: 14,
+          style: GoogleFonts.inter(
+            fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: Colors.white.withOpacity(0.7),
+            color: Colors.white.withOpacity(0.5),
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 10),
         SizedBox(
-          height: 36,
+          height: 40,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: ProfileColors.palette.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 8),
+            separatorBuilder: (_, __) => const SizedBox(width: 10),
             itemBuilder: (context, index) {
               final color = ProfileColors.palette[index];
               final isSelected = index == _colorIndex;
               return GestureDetector(
                 onTap: () => setState(() => _colorIndex = index),
-                child: Container(
-                  width: 36,
-                  height: 36,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeOut,
+                  width: isSelected ? 44 : 32,
+                  height: isSelected ? 44 : 32,
                   decoration: BoxDecoration(
                     color: color,
                     shape: BoxShape.circle,
                     border: isSelected
-                        ? Border.all(color: Colors.white, width: 3)
+                        ? Border.all(color: Colors.white, width: 2.5)
+                        : null,
+                    boxShadow: isSelected
+                        ? [
+                            BoxShadow(
+                              color: color.withOpacity(0.4),
+                              blurRadius: 10,
+                              spreadRadius: 1,
+                            ),
+                          ]
                         : null,
                   ),
+                  child: isSelected
+                      ? const Icon(Icons.check_rounded,
+                          color: Colors.black, size: 20)
+                      : null,
                 ),
               );
             },
@@ -358,7 +399,6 @@ class _ProfileEditorScreenState extends ConsumerState<ProfileEditorScreen> {
       final profile = _buildProfile();
       final sshService = ref.read(sshServiceProvider);
 
-      // Get private key if needed
       String? privateKey;
       if (_authType != AuthType.password && _selectedKeyId != null) {
         privateKey = await ref
@@ -374,15 +414,18 @@ class _ProfileEditorScreenState extends ConsumerState<ProfileEditorScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Row(
               children: [
-                Icon(Icons.check_circle, color: Color(0xFF00E676)),
-                SizedBox(width: 8),
-                Text('Connection successful!'),
+                const Icon(Icons.check_circle_rounded,
+                    color: AppConstants.primaryGreen),
+                const SizedBox(width: 8),
+                Text(
+                  'Connection successful!',
+                  style: GoogleFonts.inter(),
+                ),
               ],
             ),
-            backgroundColor: Color(0xFF1A1A2E),
           ),
         );
       }
@@ -392,12 +435,11 @@ class _ProfileEditorScreenState extends ConsumerState<ProfileEditorScreen> {
           SnackBar(
             content: Row(
               children: [
-                const Icon(Icons.error, color: Colors.red),
+                const Icon(Icons.error_outline_rounded, color: Colors.red),
                 const SizedBox(width: 8),
                 Expanded(child: Text(e.toString())),
               ],
             ),
-            backgroundColor: const Color(0xFF1A1A2E),
           ),
         );
       }
@@ -421,8 +463,8 @@ class _ProfileEditorScreenState extends ConsumerState<ProfileEditorScreen> {
         SnackBar(
           content: Text(
             _isEditing ? 'Connection updated' : 'Connection saved',
+            style: GoogleFonts.inter(),
           ),
-          backgroundColor: const Color(0xFF1A1A2E),
         ),
       );
     }
@@ -449,7 +491,6 @@ class _ProfileEditorScreenState extends ConsumerState<ProfileEditorScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A2E),
         title: const Text('Delete Connection'),
         content: Text(
           'Delete "${_labelController.text.trim()}"? This cannot be undone.',

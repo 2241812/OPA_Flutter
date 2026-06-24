@@ -6,13 +6,39 @@ Built with **Flutter**, **dartssh2** (SSH client), and **xterm.dart** (terminal 
 
 ---
 
-## Features (MVP v0.1)
+## ✨ What's New in v0.2
 
-- **🔌 Connection Profiles** — Save host/port/credentials for one-tap connections
-- **💻 Terminal Emulator** — Interactive shell with VT100/256-color support, scrollback, mobile-friendly special keys
+- **🎨 Refined Dark Aesthetic** — Glassmorphism cards with frosted-glass blur, green accent glow borders, and rounded corners throughout the entire UI
+- **🚀 Onboarding Flow** — 4-slide welcome experience for first-time users covering app introduction, connection setup, SSH key generation, and quick commands
+- **🤖 Agent Presets Quick-Launch** — 20+ built-in presets for AI agents (Claude Code, opencode, aider, Gemini CLI, Codex…), dev tools (htop, lazygit, tmux, nvim…), and system commands — all with color-coded icons and one-tap launch
+- **📱 Terminal Auto-Optimization** — Font size auto-adjusts based on screen width to fit 80+ columns in portrait and 120+ in landscape; manual pinch-to-zoom is preserved
+- **🖥️ Landscape Immersive Mode** — Full-screen terminal in landscape with hidden app bar, compact keyboard bar, and immersive sticky system UI
+- **💫 Animations** — Smooth fade-in, slide-up, scale, and shimmer animations on cards, screens, and interactive elements via `flutter_animate`
+- **🔤 Google Fonts** — Inter for UI text, JetBrains Mono for the terminal emulator
+
+---
+
+## Features
+
+### Core
+- **🔌 Connection Profiles** — Save host/port/credentials for one-tap connections with per-connection color coding
+- **💻 Terminal Emulator** — Interactive shell with VT100/256-color support, scrollback, auto-fit font sizing, and mobile-friendly special keys
 - **🔐 Key Management** — Generate Ed25519 keys or import existing ones, stored in Android Keystore
-- **⚡ Quick Commands** — Save frequently-run commands (e.g. launching agent harnesses) for one-tap execution
-- **🎨 Dark theme** — Terminal-inspired UI with per-connection color coding
+- **⚡ Quick Commands** — Save frequently-run commands for one-tap execution, or launch from 20+ built-in agent presets
+
+### Agent Presets (built-in)
+
+| Category | Presets |
+|---|---|
+| 🤖 AI Agents | Claude Code, opencode, aider, Cursor Agent, Gemini CLI, Qwen Code, Codex, Goose |
+| 🛠️ Dev Tools | htop, btop, lazygit, lazydocker, tmux, nvim, yazi |
+| ⚙️ System | neofetch, systemctl status, disk usage, recent logs, uptime |
+
+### Design
+- **Glassmorphism UI** — Frosted-glass cards with backdrop blur, colored accent bars, and subtle glow shadows
+- **Spring/fade animations** — Every screen transition and card appearance is smoothly animated
+- **Dark theme** — Deep charcoal background with terminal-inspired green accents
+- **Onboarding** — First-launch 4-slide walkthrough with Skip/Next navigation
 
 ---
 
@@ -31,15 +57,11 @@ Built with **Flutter**, **dartssh2** (SSH client), and **xterm.dart** (terminal 
 # 1. Install dependencies
 flutter pub get
 
-# 2. (Optional) Generate Hive adapters — but we ship manual adapters,
-#    so code generation is not required for the MVP.
-# dart run build_runner build --delete-conflicting-outputs
-
-# 3. Run on a connected device
+# 2. Run on a connected device
 flutter devices        # verify your device is listed
 flutter run
 
-# 4. Build a release APK
+# 3. Build a release APK
 flutter build apk --release
 ```
 
@@ -51,36 +73,43 @@ The built APK will be at `build/app/outputs/flutter-apk/app-release.apk`.
 
 ```
 lib/
-├── main.dart                          # App entry, Hive init, theme, routing
-├── app_theme.dart                     # Dark terminal-inspired theme
-├── app_router.dart                    # GoRouter configuration
+├── main.dart                          # App entry, Hive init, SharedPreferences, theme, routing
+├── app_theme.dart                     # Refined dark theme with glassmorphism (Google Fonts)
+├── app_router.dart                    # GoRouter with onboarding guard + slide/fade transitions
 ├── models/
 │   ├── connection_profile.dart         # SSH connection profile model
 │   ├── ssh_key_pair.dart               # SSH key metadata model
-│   └── quick_command.dart              # Saved command model
+│   └── quick_command.dart              # Saved command model (with presetId support)
 ├── services/
-│   ├── ssh_service.dart               # dartssh2 wrapper (connect/shell/exec)
+│   ├── ssh_service.dart               # dartssh2 wrapper (connect/shell/exec with resize)
 │   ├── key_service.dart               # Key gen (pinenacl) + secure storage
+│   ├── onboarding_service.dart         # First-launch detection (SharedPreferences)
 │   ├── profile_storage_service.dart   # Hive persistence for profiles/commands
-│   └── hive_adapters.dart             # Manual Hive type adapters
+│   └── hive_adapters.dart             # Manual Hive type adapters (backward-compatible)
 ├── screens/
-│   ├── home_screen.dart               # Connection list + quick commands
-│   ├── terminal_screen.dart           # xterm.dart terminal view
-│   ├── profile_editor_screen.dart     # Add/edit connections
-│   ├── key_management_screen.dart     # Generate/import/delete keys
-│   └── quick_commands_screen.dart     # Manage saved commands
+│   ├── home_screen.dart               # Connection list + quick commands + glassmorphism
+│   ├── onboarding_screen.dart         # 4-slide welcome flow with animations
+│   ├── terminal_screen.dart           # xterm.dart with auto-fit + landscape immersive
+│   ├── profile_editor_screen.dart     # Add/edit connections (refined styling)
+│   ├── key_management_screen.dart     # Generate/import/delete keys (glassmorphism)
+│   └── quick_commands_screen.dart     # Manage commands + agent presets quick-launch
 ├── widgets/
-│   ├── connection_card.dart           # Profile card + color palette
-│   └── key_card.dart                  # Key card with copy/delete
+│   ├── connection_card.dart           # Glassmorphism profile card with glow accent
+│   └── key_card.dart                  # Glassmorphism key card with icon container
 └── utils/
-    └── constants.dart                 # App-wide constants
+    ├── constants.dart                 # App-wide constants, colors, terminal sizing
+    └── agent_presets.dart             # 20+ agent/tool preset catalog
 ```
 
 ---
 
 ## How to Use
 
-### 1. Add a Connection
+### 1. Onboarding (First Launch)
+- When you first open OPA, a 4-slide walkthrough introduces the app
+- Tap **Skip** to go straight to the home screen, or swipe through all slides
+
+### 2. Add a Connection
 - Tap the **+** FAB on the home screen
 - Enter your server's host, port (default 22), and username
 - Choose an authentication method:
@@ -88,7 +117,7 @@ lib/
   - **Key** — more secure (generate or import a key first)
   - **Both** — password + key
 
-### 2. Set Up Key-Based Auth
+### 3. Set Up Key-Based Auth
 - Go to **SSH Keys** (key icon in app bar)
 - Tap **+** → **Generate Ed25519 Key**
 - Tap the copy icon on the key card to copy the public key
@@ -97,18 +126,25 @@ lib/
   echo "ssh-ed25519 AAAA... opa" >> ~/.ssh/authorized_keys
   ```
 
-### 3. Connect & Run Commands
+### 4. Connect & Use the Terminal
 - Tap a connection card to open the terminal
+- Font size auto-adjusts to fit your screen — 80+ columns in portrait, 120+ in landscape
+- **Rotate to landscape** for immersive full-screen terminal mode
 - Use the **mobile keyboard bar** at the bottom for TAB, ESC, arrows, Ctrl+C, etc.
-- Pinch to zoom the font size
+- Pinch to zoom — auto-fit will respect your manual adjustment
 
-### 4. Save Quick Commands
+### 5. Launch Agent Presets
 - Go to **Quick Commands** (lightning icon)
+- Browse built-in presets by category (AI Agents, Dev Tools, System)
+- Tap a preset → pick a server → command launches in terminal
+- Presets auto-save as quick commands on first use
+
+### 6. Save Custom Quick Commands
+- Go to **Quick Commands** → tap **+**
 - Save commands you run often, optionally linked to a profile
 - Example commands for AI agents:
   ```
   cd ~/projects/my-agent && python -m agent --start
-  zcode --version
   tmux new -s agents
   ```
 
@@ -151,7 +187,10 @@ sudo systemctl enable --now ssh
 | [`flutter_secure_storage`](https://pub.dev/packages/flutter_secure_storage) | Encrypted private key storage |
 | [`hive`](https://pub.dev/packages/hive) | Local NoSQL storage for profiles |
 | [`flutter_riverpod`](https://pub.dev/packages/flutter_riverpod) | State management |
-| [`go_router`](https://pub.dev/packages/go_router) | Navigation |
+| [`go_router`](https://pub.dev/packages/go_router) | Navigation with transitions |
+| [`google_fonts`](https://pub.dev/packages/google_fonts) | Inter + JetBrains Mono fonts |
+| [`flutter_animate`](https://pub.dev/packages/flutter_animate) | Declarative animations |
+| [`shared_preferences`](https://pub.dev/packages/shared_preferences) | Onboarding first-launch detection |
 
 ---
 
@@ -164,6 +203,7 @@ sudo systemctl enable --now ssh
 - [ ] Session recording & replay
 - [ ] Snippet/profile import/export
 - [ ] iOS support
+- [ ] Custom preset editor (add your own agent presets)
 
 ---
 

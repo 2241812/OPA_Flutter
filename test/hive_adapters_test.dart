@@ -1,5 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
+import 'package:hive/src/binary/binary_reader_impl.dart';
+import 'package:hive/src/binary/binary_writer_impl.dart';
+import 'package:hive/src/registry/type_registry_impl.dart';
 import 'package:opa/models/connection_profile.dart';
 import 'package:opa/models/quick_command.dart';
 import 'package:opa/models/stored_key_pair.dart';
@@ -193,12 +196,15 @@ void main() {
 
 /// Serialize [value] through a Hive [TypeAdapter] and read it back.
 T _roundTrip<T>(T value, TypeAdapter<T> adapter) {
-  final writer = BinaryWriter();
+  final registry = TypeRegistryImpl();
+  registry.registerAdapter(adapter, internal: true);
+
+  final writer = BinaryWriterImpl(registry);
   writer.writeByte(adapter.typeId);
   adapter.write(writer, value);
   final bytes = writer.toBytes();
 
-  final reader = BinaryReader(bytes);
+  final reader = BinaryReaderImpl(bytes, registry);
   reader.readByte(); // consume the typeId
   return adapter.read(reader);
 }

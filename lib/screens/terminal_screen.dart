@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:typed_data';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:xterm/xterm.dart';
 
 import '../services/key_service.dart';
@@ -12,6 +14,10 @@ import '../services/ssh_service.dart';
 import '../utils/constants.dart';
 
 /// Full-screen terminal screen connected to an SSH session.
+///
+/// Auto-optimizes the font size to fit at least 80 columns in portrait and
+/// 120 columns in landscape, so TUI apps (opencode, aider, etc.) render fully.
+/// In landscape, system chrome is hidden for maximum terminal area.
 class TerminalScreen extends ConsumerStatefulWidget {
   const TerminalScreen({super.key, required this.profileId});
 
@@ -22,7 +28,8 @@ class TerminalScreen extends ConsumerStatefulWidget {
   ConsumerState<TerminalScreen> createState() => _TerminalScreenState();
 }
 
-class _TerminalScreenState extends ConsumerState<TerminalScreen> {
+class _TerminalScreenState extends ConsumerState<TerminalScreen>
+    with WidgetsBindingObserver {
   late final Terminal _terminal;
   late final TerminalController _terminalController;
 
@@ -32,14 +39,17 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
   String? _error;
   double _fontSize = AppConstants.defaultFontSize;
 
+  // True if the user has manually pinched to zoom (disables auto-fit).
+  bool _userZoomed = false;
+  // Last calculated available size (to detect orientation changes).
+  Size _lastTerminalSize = Size.zero;
+
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
 
-    _terminal = Terminal(
-      maxScrollbackLines: AppConstants.defaultScrollbackLines,
-    );
-
+    _terminal = Terminal();
     _terminalController = TerminalController();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -49,10 +59,53 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _restoreSystemUI();
     _stdoutSub?.cancel();
-    _terminal.dispose();
     ref.read(sshServiceProvider).disconnect();
     super.dispose();
+  }
+
+  @override
+  void didChangeMetrics() {
+    super.didChangeMetrics();
+    // Re-evaluate orientation and system UI after rotation.
+    if (mounted) {
+      _handleOrientation();
+    }
+  }
+
+  /// Compute the optimal font size to fit [targetCols] columns within the
+  /// given terminal area width. Returns a value clamped to font bounds.
+  double _computeOptimalFontSize(double areaWidth, int targetCols) {
+    // Each monospace char is approximately fontSize * charWidthRatio wide.
+    // Solve: fontSize = areaWidth / (targetCols * ratio)
+    final computed =
+        areaWidth / (targetCols * AppConstants.charWidthRatio);
+    return computed.clamp(AppConstants.minFontSize, AppConstants.maxFontSize);
+  }
+
+  /// Detect landscape and apply immersive mode + slim UI accordingly.
+  void _handleOrientation() {
+    final size = MediaQuery.of(context).size;
+    final isLandscape = size.width > size.height;
+
+    if (isLandscape) {
+      // Hide system chrome in landscape for maximum terminal area.
+      SystemChrome.setEnabledSystemUIMode(
+        SystemUiMode.immersiveSticky,
+        overlays: [],
+      );
+    } else {
+      _restoreSystemUI();
+    }
+  }
+
+  void _restoreSystemUI() {
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.edgeToEdge,
+      overlays: SystemUiOverlay.values,
+    );
   }
 
   Future<void> _connect() async {
@@ -61,7 +114,6 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
       _error = null;
     });
 
-    // Write connection banner to terminal
     _terminal.write(
       '\x1b[1;32m⬡ OPA — OpenSSH Pocket Agent v${AppConstants.appVersion}\x1b[0m\r\n\r\n'
       '\x1b[33mConnecting...\x1b[0m\r\n',
@@ -76,13 +128,12 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
 
       final sshService = ref.read(sshServiceProvider);
 
-      // Get private key if needed
       String? privateKey;
       if (profile.keyId != null) {
-        privateKey = await ref.read(keyServiceProvider).getPrivateKey(profile.keyId!);
+        privateKey =
+            await ref.read(keyServiceProvider).getPrivateKey(profile.keyId!);
       }
 
-      // Connect
       await sshService.connect(
         profile: profile,
         privateKey: privateKey,
@@ -92,10 +143,13 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
       _terminal.write(
           '\x1b[32m✓ Connected to ${profile.displayName}\x1b[0m\r\n\r\n');
 
-      // Open interactive shell (async in dartssh2 v2.x)
-      final session = await sshService.startShell();
+      // Use current terminal dimensions for initial PTY (xterm computes
+      // cols/rows once the TerminalView is laid out).
+      final session = await sshService.startShell(
+        cols: _terminal.viewWidth > 0 ? _terminal.viewWidth : 80,
+        rows: _terminal.viewHeight > 0 ? _terminal.viewHeight : 24,
+      );
 
-      // Wire stdout → terminal
       _stdoutSub = session.stdout.listen(
         (data) {
           if (mounted) {
@@ -116,12 +170,10 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
         },
       );
 
-      // Wire terminal input → stdin
       _terminal.onOutput = (String data) {
         session.stdinSink.add(Uint8List.fromList(data.codeUnits));
       };
 
-      // Handle terminal resize (cols/rows — pixel dims ignored)
       _terminal.onResize = (width, height, pixelWidth, pixelHeight) {
         sshService.resizeShell(cols: width, rows: height);
       };
@@ -131,13 +183,11 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
         _isConnecting = false;
       });
 
-      // Update connection status in profile
       await storage.updateConnectionStatus(profile.id, true);
     } catch (e) {
       if (mounted) {
         _terminal.write('\r\n\x1b[31m✗ Connection failed:\x1b[0m $e\r\n\r\n');
 
-        // Update connection status in profile
         final storage = ref.read(profileStorageProvider);
         await storage.updateConnectionStatus(widget.profileId, false);
 
@@ -156,35 +206,39 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
   }
 
   void _sendCtrlC() {
-    _terminal.keyInput(TerminalKey.controlC);
+    _terminal.textInput(String.fromCharCode(3));
   }
 
   void _sendCtrlD() {
-    _terminal.keyInput(TerminalKey.controlD);
+    _terminal.textInput(String.fromCharCode(4));
   }
 
   void _copySelection() {
-    final text = _terminal.selectedText;
-    if (text != null && text.isNotEmpty) {
-      Clipboard.setData(ClipboardData(text: text));
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Copied to clipboard'),
-          duration: Duration(seconds: 1),
-        ),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('No selection to copy'),
-          duration: Duration(seconds: 1),
-        ),
-      );
+    final selection = _terminalController.selection;
+    if (selection != null) {
+      final text = _terminal.buffer.getText(selection);
+      if (text.isNotEmpty) {
+        Clipboard.setData(ClipboardData(text: text));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Copied to clipboard', style: GoogleFonts.inter()),
+            duration: const Duration(seconds: 1),
+          ),
+        );
+        return;
+      }
     }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Select text to copy', style: GoogleFonts.inter()),
+        duration: const Duration(seconds: 1),
+      ),
+    );
   }
 
   void _zoomIn() {
     setState(() {
+      _userZoomed = true;
       _fontSize = (_fontSize + 1).clamp(
         AppConstants.minFontSize,
         AppConstants.maxFontSize,
@@ -194,6 +248,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
 
   void _zoomOut() {
     setState(() {
+      _userZoomed = true;
       _fontSize = (_fontSize - 1).clamp(
         AppConstants.minFontSize,
         AppConstants.maxFontSize,
@@ -201,191 +256,254 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
     });
   }
 
+  void _resetAutoFit() {
+    setState(() {
+      _userZoomed = false;
+      _lastTerminalSize = Size.zero; // force recompute
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Determine if this is a wide screen (tablet/landscape)
-    final isWide = MediaQuery.of(context).size.shortestSide >= 600;
+    final mq = MediaQuery.of(context);
+    final size = mq.size;
+    final isLandscape = size.width > size.height;
+    // The keyboard bar shows only on narrow (phone) screens.
+    final showKeyboardBar = mq.size.shortestSide < 600;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          ref
-                  .read(profileStorageProvider)
-                  .getProfile(widget.profileId)
-                  ?.shortLabel ??
-              'Terminal',
-        ),
-        actions: [
-          // Zoom controls
-          IconButton(
-            icon: const Icon(Icons.zoom_out, size: 20),
-            tooltip: 'Zoom out',
-            onPressed: _zoomOut,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 16),
-            child: Text(
-              '${_fontSize.toInt()}',
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.white.withOpacity(0.5),
-              ),
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.zoom_in, size: 20),
-            tooltip: 'Zoom in',
-            onPressed: _zoomIn,
-          ),
-          const SizedBox(width: 8),
-          PopupMenuButton<String>(
-            onSelected: (action) {
-              switch (action) {
-                case 'ctrl_c':
-                  _sendCtrlC();
-                  break;
-                case 'ctrl_d':
-                  _sendCtrlD();
-                  break;
-                case 'copy':
-                  _copySelection();
-                  break;
-                case 'disconnect':
-                  _disconnect();
-                  break;
-                case 'reconnect':
-                  _disconnect();
-                  _connect();
-                  break;
-              }
-            },
-            itemBuilder: (context) => [
-              const PopupMenuItem(
-                value: 'ctrl_c',
-                child: Row(
-                  children: [
-                    Icon(Icons.stop_circle_outlined, size: 18),
-                    SizedBox(width: 12),
-                    Text('Ctrl+C'),
-                  ],
-                ),
-              ),
-              const PopupMenuItem(
-                value: 'ctrl_d',
-                child: Row(
-                  children: [
-                    Icon(Icons.door_front_door, size: 18),
-                    SizedBox(width: 12),
-                    Text('Ctrl+D (EOF)'),
-                  ],
-                ),
-              ),
-              const PopupMenuItem(
-                value: 'copy',
-                child: Row(
-                  children: [
-                    Icon(Icons.copy, size: 18),
-                    SizedBox(width: 12),
-                    Text('Copy selection'),
-                  ],
-                ),
-              ),
-              const PopupMenuDivider(),
-              if (_isConnected)
-                const PopupMenuItem(
-                  value: 'disconnect',
-                  child: Row(
-                    children: [
-                      Icon(Icons.link_off, size: 18, color: Colors.red),
-                      SizedBox(width: 12),
-                      Text('Disconnect'),
-                    ],
-                  ),
-                ),
-              if (!_isConnected)
-                const PopupMenuItem(
-                  value: 'reconnect',
-                  child: Row(
-                    children: [
-                      Icon(Icons.refresh, size: 18, color: Color(0xFF00E676)),
-                      SizedBox(width: 12),
-                      Text('Reconnect'),
-                    ],
-                  ),
-                ),
-            ],
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          // Connection status bar
-          _buildStatusBar(),
-          // Terminal view
-          Expanded(
-            child: GestureDetector(
-              onScaleUpdate: (details) {
-                // Pinch-to-zoom
-                if (details.scale != 1.0) {
-                  setState(() {
-                    _fontSize = (_fontSize * details.scale).clamp(
-                      AppConstants.minFontSize,
-                      AppConstants.maxFontSize,
-                    );
-                  });
-                }
-              },
-              child: TerminalView(
-                _terminal,
-                controller: _terminalController,
-                autofocus: true,
-                backgroundOpacity: 1.0,
-                textStyle: TextStyle(
-                  fontFamily: 'monospace',
-                  fontSize: _fontSize,
-                  height: 1.2,
-                  color: Colors.white,
-                  backgroundColor: Colors.transparent,
-                ),
-                cursorType: TerminalCursorType.block,
-                padding: const EdgeInsets.all(8),
-                theme: TerminalTheme(
-                  cursor: const Color(0xFF00E676),
-                  selection: const Color(0x7F00E676),
-                  foreground: Colors.white,
-                  background: const Color(0xFF0F0F1A),
-                  black: const Color(0xFF000000),
-                  red: const Color(0xFFFF5252),
-                  green: const Color(0xFF00E676),
-                  yellow: const Color(0xFFFFAB40),
-                  blue: const Color(0xFF448AFF),
-                  magenta: const Color(0xFFE040FB),
-                  cyan: const Color(0xFF18FFFF),
-                  white: const Color(0xFFFFFFFF),
-                  brightBlack: const Color(0xFF546E7A),
-                  brightRed: const Color(0xFFFF8A80),
-                  brightGreen: const Color(0xFF69F0AE),
-                  brightYellow: const Color(0xFFFFD740),
-                  brightBlue: const Color(0xFF82B1FF),
-                  brightMagenta: const Color(0xFFFF80AB),
-                  brightCyan: const Color(0xFF84FFFF),
-                  brightWhite: const Color(0xFFFFFFFF),
-                  searchHitBackground: const Color(0x7FFFFFFF),
-                  searchHitBackgroundCurrent: const Color(0x7F00E676),
-                  searchHitForeground: const Color(0xFF000000),
-                ),
-              ),
-            ),
-          ),
+      // No AppBar in landscape → maximize vertical space.
+      appBar: isLandscape ? null : _buildAppBar(),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final areaWidth = constraints.maxWidth;
+          final areaHeight = constraints.maxHeight;
 
-          // Extra keyboard row for special keys (useful on mobile)
-          if (!isWide) _buildMobileKeyboardBar(),
-        ],
+          // ── Auto-fit font size ──
+          // Only recompute when the available size changes significantly AND
+          // the user hasn't manually zoomed.
+          if (!_userZoomed) {
+            final sizeChanged =
+                (_lastTerminalSize.width - areaWidth).abs() > 4 ||
+                    (_lastTerminalSize.height - areaHeight).abs() > 4;
+            if (sizeChanged || _lastTerminalSize == Size.zero) {
+              final targetCols = isLandscape
+                  ? AppConstants.targetMinColsLandscape
+                  : AppConstants.targetMinColsPortrait;
+              final optimal = _computeOptimalFontSize(areaWidth, targetCols);
+              if ((optimal - _fontSize).abs() > 0.5) {
+                _fontSize = optimal;
+              }
+              _lastTerminalSize = Size(areaWidth, areaHeight);
+            }
+          }
+
+          return Column(
+            children: [
+              _buildStatusBar(isLandscape),
+              Expanded(
+                child: GestureDetector(
+                  onScaleUpdate: (details) {
+                    if (details.scale != 1.0) {
+                      setState(() {
+                        _userZoomed = true;
+                        _fontSize = (_fontSize * details.scale).clamp(
+                          AppConstants.minFontSize,
+                          AppConstants.maxFontSize,
+                        );
+                      });
+                    }
+                  },
+                  child: TerminalView(
+                    _terminal,
+                    controller: _terminalController,
+                    autofocus: true,
+                    backgroundOpacity: 1.0,
+                    textStyle: TerminalStyle(
+                      fontFamily: 'JetBrainsMono',
+                      fontSize: _fontSize,
+                    ),
+                    cursorType: TerminalCursorType.block,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: isLandscape ? 4 : 8,
+                    ),
+                    theme: _terminalTheme,
+                  ),
+                ),
+              ),
+              if (showKeyboardBar)
+                _buildMobileKeyboardBar(isLandscape),
+            ],
+          );
+        },
       ),
     );
   }
 
-  Widget _buildStatusBar() {
+  // ── Terminal color theme ──────────────────────────────────────────
+
+  static final TerminalTheme _terminalTheme = TerminalTheme(
+    cursor: AppConstants.primaryGreen,
+    selection: const Color(0x7F00E676),
+    foreground: Colors.white,
+    background: AppConstants.backgroundDark,
+    black: const Color(0xFF000000),
+    red: const Color(0xFFFF5252),
+    green: AppConstants.primaryGreen,
+    yellow: const Color(0xFFFFAB40),
+    blue: const Color(0xFF448AFF),
+    magenta: const Color(0xFFE040FB),
+    cyan: const Color(0xFF18FFFF),
+    white: const Color(0xFFFFFFFF),
+    brightBlack: const Color(0xFF546E7A),
+    brightRed: const Color(0xFFFF8A80),
+    brightGreen: const Color(0xFF69F0AE),
+    brightYellow: const Color(0xFFFFD740),
+    brightBlue: const Color(0xFF82B1FF),
+    brightMagenta: const Color(0xFFFF80AB),
+    brightCyan: const Color(0xFF84FFFF),
+    brightWhite: const Color(0xFFFFFFFF),
+    searchHitBackground: const Color(0x7FFFFFFF),
+    searchHitBackgroundCurrent: const Color(0x7F00E676),
+    searchHitForeground: const Color(0xFF000000),
+  );
+
+  // ── AppBar ───────────────────────────────────────────────────────
+
+  PreferredSizeWidget _buildAppBar() {
+    return AppBar(
+      toolbarHeight: 48,
+      title: Text(
+        ref
+                .read(profileStorageProvider)
+                .getProfile(widget.profileId)
+                ?.shortLabel ??
+            'Terminal',
+        style: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w600),
+      ),
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.zoom_out_rounded, size: 20),
+          tooltip: 'Zoom out',
+          onPressed: _zoomOut,
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 14),
+          child: Text(
+            '${_fontSize.toInt()}',
+            style: GoogleFonts.jetBrainsMono(
+              fontSize: 12,
+              color: Colors.white.withOpacity(0.4),
+            ),
+          ),
+        ),
+        IconButton(
+          icon: const Icon(Icons.zoom_in_rounded, size: 20),
+          tooltip: 'Zoom in',
+          onPressed: _zoomIn,
+        ),
+        IconButton(
+          icon: Icon(
+            _userZoomed
+                ? Icons.fit_screen_outlined
+                : Icons.fit_screen_rounded,
+            size: 18,
+            color: _userZoomed
+                ? AppConstants.primaryGreen
+                : Colors.white.withOpacity(0.4),
+          ),
+          tooltip: 'Auto-fit',
+          onPressed: _resetAutoFit,
+        ),
+        const SizedBox(width: 4),
+        PopupMenuButton<String>(
+          icon: const Icon(Icons.more_vert_rounded),
+          onSelected: (action) {
+            switch (action) {
+              case 'ctrl_c':
+                _sendCtrlC();
+                break;
+              case 'ctrl_d':
+                _sendCtrlD();
+                break;
+              case 'copy':
+                _copySelection();
+                break;
+              case 'autofit':
+                _resetAutoFit();
+                break;
+              case 'disconnect':
+                _disconnect();
+                break;
+              case 'reconnect':
+                _disconnect();
+                _connect();
+                break;
+            }
+          },
+          itemBuilder: (context) => [
+            const PopupMenuItem(
+              value: 'ctrl_c',
+              child: Row(children: [
+                Icon(Icons.stop_circle_outlined, size: 18),
+                SizedBox(width: 12),
+                Text('Ctrl+C'),
+              ]),
+            ),
+            const PopupMenuItem(
+              value: 'ctrl_d',
+              child: Row(children: [
+                Icon(Icons.door_front_door_outlined, size: 18),
+                SizedBox(width: 12),
+                Text('Ctrl+D (EOF)'),
+              ]),
+            ),
+            const PopupMenuItem(
+              value: 'copy',
+              child: Row(children: [
+                Icon(Icons.copy_rounded, size: 18),
+                SizedBox(width: 12),
+                Text('Copy selection'),
+              ]),
+            ),
+            const PopupMenuItem(
+              value: 'autofit',
+              child: Row(children: [
+                Icon(Icons.fit_screen_rounded, size: 18),
+                SizedBox(width: 12),
+                Text('Auto-fit to screen'),
+              ]),
+            ),
+            const PopupMenuDivider(),
+            if (_isConnected)
+              const PopupMenuItem(
+                value: 'disconnect',
+                child: Row(children: [
+                  Icon(Icons.link_off_rounded, size: 18, color: Colors.red),
+                  SizedBox(width: 12),
+                  Text('Disconnect'),
+                ]),
+              ),
+            if (!_isConnected)
+              const PopupMenuItem(
+                value: 'reconnect',
+                child: Row(children: [
+                  Icon(Icons.refresh_rounded,
+                      size: 18, color: AppConstants.primaryGreen),
+                  SizedBox(width: 12),
+                  Text('Reconnect'),
+                ]),
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  // ── Status bar ───────────────────────────────────────────────────
+
+  Widget _buildStatusBar(bool isLandscape) {
     Color statusColor;
     String statusText;
 
@@ -393,105 +511,124 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
       statusColor = const Color(0xFFFFAB40);
       statusText = '⏳ Connecting...';
     } else if (_isConnected) {
-      statusColor = const Color(0xFF00E676);
+      statusColor = AppConstants.primaryGreen;
       statusText = '● Connected';
     } else if (_error != null) {
       statusColor = Colors.red;
       statusText = '✗ Disconnected';
     } else {
-      statusColor = Colors.grey;
+      statusColor = Colors.white.withOpacity(0.3);
       statusText = '○ Disconnected';
     }
 
-    return Container(
-      height: 28,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      color: const Color(0xFF1A1A2E),
-      child: Row(
-        children: [
-          Container(
-            width: 8,
-            height: 8,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: statusColor,
-            ),
+    return ClipRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+        child: Container(
+          height: isLandscape
+              ? AppConstants.statusBarHeightLandscape
+              : AppConstants.statusBarHeightPortrait,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          color: AppConstants.surfaceDark.withOpacity(0.7),
+          child: Row(
+            children: [
+              Container(
+                width: 8,
+                height: 8,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: statusColor,
+                  boxShadow: [
+                    BoxShadow(
+                      color: statusColor.withOpacity(0.5),
+                      blurRadius: 4,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                statusText,
+                style: GoogleFonts.inter(
+                  fontSize: 11,
+                  color: statusColor,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const Spacer(),
+              Text(
+                '${_terminal.viewWidth}×${_terminal.viewHeight}',
+                style: GoogleFonts.jetBrainsMono(
+                  fontSize: 11,
+                  color: Colors.white.withOpacity(0.3),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 8),
-          Text(
-            statusText,
-            style: TextStyle(
-              fontSize: 11,
-              color: statusColor,
-              fontFamily: 'monospace',
-            ),
-          ),
-          const Spacer(),
-          Text(
-            '${_terminal.viewWidth}×${_terminal.viewHeight}',
-            style: TextStyle(
-              fontSize: 11,
-              color: Colors.white.withOpacity(0.3),
-              fontFamily: 'monospace',
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildMobileKeyboardBar() {
-    return Container(
-      height: 44,
-      color: const Color(0xFF1A1A2E),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          _SpecialKeyButton(
-            label: 'TAB',
-            onPressed: () => _terminal.keyInput(TerminalKey.tab),
+  // ── Mobile keyboard bar ──────────────────────────────────────────
+
+  Widget _buildMobileKeyboardBar(bool isLandscape) {
+    final barHeight = isLandscape
+        ? AppConstants.keyboardBarHeightLandscape
+        : AppConstants.keyboardBarHeightPortrait;
+
+    // Compact layout in landscape — only essential keys.
+    final keys = isLandscape
+        ? [
+            _KeyDef('TAB', () => _terminal.keyInput(TerminalKey.tab)),
+            _KeyDef('ESC', () => _terminal.keyInput(TerminalKey.escape)),
+            _KeyDef('↑', () => _terminal.keyInput(TerminalKey.arrowUp)),
+            _KeyDef('↓', () => _terminal.keyInput(TerminalKey.arrowDown)),
+            _KeyDef('←', () => _terminal.keyInput(TerminalKey.arrowLeft)),
+            _KeyDef('→', () => _terminal.keyInput(TerminalKey.arrowRight)),
+            _KeyDef('CTRL', _sendCtrlC, color: const Color(0xFFFF5252)),
+          ]
+        : [
+            _KeyDef('TAB', () => _terminal.keyInput(TerminalKey.tab)),
+            _KeyDef('ESC', () => _terminal.keyInput(TerminalKey.escape)),
+            _KeyDef('↑', () => _terminal.keyInput(TerminalKey.arrowUp)),
+            _KeyDef('↓', () => _terminal.keyInput(TerminalKey.arrowDown)),
+            _KeyDef('←', () => _terminal.keyInput(TerminalKey.arrowLeft)),
+            _KeyDef('→', () => _terminal.keyInput(TerminalKey.arrowRight)),
+            _KeyDef('CTRL', _sendCtrlC, color: const Color(0xFFFF5252)),
+            _KeyDef('/', () => _terminal.textInput('/')),
+            _KeyDef('|', () => _terminal.textInput('|')),
+            _KeyDef('-', () => _terminal.textInput('-')),
+          ];
+
+    return ClipRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+        child: Container(
+          height: barHeight,
+          color: AppConstants.surfaceDark.withOpacity(0.8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: keys
+                .map((k) => _SpecialKeyButton(
+                      label: k.label,
+                      onPressed: k.onPressed,
+                      color: k.color,
+                    ))
+                .toList(),
           ),
-          _SpecialKeyButton(
-            label: 'ESC',
-            onPressed: () => _terminal.keyInput(TerminalKey.escape),
-          ),
-          _SpecialKeyButton(
-            label: '↑',
-            onPressed: () => _terminal.keyInput(TerminalKey.arrowUp),
-          ),
-          _SpecialKeyButton(
-            label: '↓',
-            onPressed: () => _terminal.keyInput(TerminalKey.arrowDown),
-          ),
-          _SpecialKeyButton(
-            label: '←',
-            onPressed: () => _terminal.keyInput(TerminalKey.arrowLeft),
-          ),
-          _SpecialKeyButton(
-            label: '→',
-            onPressed: () => _terminal.keyInput(TerminalKey.arrowRight),
-          ),
-          _SpecialKeyButton(
-            label: 'CTRL',
-            onPressed: _sendCtrlC,
-            color: const Color(0xFFFF5252),
-          ),
-          _SpecialKeyButton(
-            label: '/',
-            onPressed: () => _terminal.textInput('/'),
-          ),
-          _SpecialKeyButton(
-            label: '|',
-            onPressed: () => _terminal.textInput('|'),
-          ),
-          _SpecialKeyButton(
-            label: '-',
-            onPressed: () => _terminal.textInput('-'),
-          ),
-        ],
+        ),
       ),
     );
   }
+}
+
+/// Internal helper holding a keyboard key definition.
+class _KeyDef {
+  const _KeyDef(this.label, this.onPressed, {this.color});
+  final String label;
+  final VoidCallback onPressed;
+  final Color? color;
 }
 
 /// Special key button for the mobile keyboard bar.
@@ -514,20 +651,19 @@ class _SpecialKeyButton extends StatelessWidget {
         onTap: onPressed,
         borderRadius: BorderRadius.circular(6),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           decoration: BoxDecoration(
             border: Border.all(
-              color: (color ?? Colors.white).withOpacity(0.2),
+              color: (color ?? Colors.white).withOpacity(0.15),
             ),
             borderRadius: BorderRadius.circular(6),
           ),
           child: Text(
             label,
-            style: TextStyle(
+            style: GoogleFonts.inter(
               fontSize: 13,
               fontWeight: FontWeight.bold,
               color: color ?? Colors.white.withOpacity(0.7),
-              fontFamily: 'monospace',
             ),
           ),
         ),

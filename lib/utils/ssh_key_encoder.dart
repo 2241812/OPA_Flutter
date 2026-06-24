@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:pinenacl/api.dart' as nacl;
+import 'package:pinenacl/ed25519.dart' as nacl;
 
 /// Helper for generating and encoding Ed25519 SSH keys.
 ///
@@ -20,7 +20,7 @@ class SshKeyEncoder {
     // key directly: `SigningKey()` generates a random Ed25519 key.
     // SigningKey is a 64-byte Uint8List (32-byte seed + 32-byte public key,
     // the "expanded" form). We need the 32-byte seed for SSH serialization.
-    final signingKey = nacl.SigningKey();
+    final signingKey = nacl.SigningKey.generate();
     final seedBytes = Uint8List.fromList(signingKey.seed);
     final publicKeyBytes = Uint8List.fromList(signingKey.verifyKey);
 

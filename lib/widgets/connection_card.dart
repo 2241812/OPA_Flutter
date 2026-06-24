@@ -1,6 +1,11 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../models/connection_profile.dart';
+import '../utils/constants.dart';
 
 /// Color palette for connection profile cards.
 class ProfileColors {
@@ -37,98 +42,143 @@ class ConnectionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final accent = ProfileColors.get(profile.colorIndex);
 
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      child: InkWell(
-        onTap: onTap,
-        onLongPress: onLongPress,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              // Status indicator dot + accent bar
-              Container(
-                width: 4,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: accent,
-                  borderRadius: BorderRadius.circular(2),
-                ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(14),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+          child: Container(
+            decoration: BoxDecoration(
+              color: AppConstants.surfaceDark.withOpacity(0.7),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.06),
               ),
-              const SizedBox(width: 16),
-              // Profile info
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        // Connection status indicator
-                        Container(
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: profile.lastConnectionSuccess
-                                ? const Color(0xFF00E676)
-                                : Colors.grey,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            profile.shortLabel,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: accent.withOpacity(0.04),
+                  blurRadius: 20,
+                  spreadRadius: 2,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: onTap,
+                onLongPress: onLongPress,
+                borderRadius: BorderRadius.circular(14),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      // Accent bar with glow
+                      Container(
+                        width: 4,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: accent,
+                          borderRadius: BorderRadius.circular(2),
+                          boxShadow: [
+                            BoxShadow(
+                              color: accent.withOpacity(0.4),
+                              blurRadius: 8,
+                              spreadRadius: 1,
                             ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                          ],
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${profile.username}@${profile.host}:${profile.port}',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.white.withOpacity(0.6),
-                        fontFamily: 'monospace',
                       ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      _authTypeLabel(profile.authType),
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: accent.withOpacity(0.8),
+                      const SizedBox(width: 16),
+                      // Profile info
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                // Connection status indicator
+                                Container(
+                                  width: 8,
+                                  height: 8,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: profile.lastConnectionSuccess
+                                        ? AppConstants.primaryGreen
+                                        : Colors.white.withOpacity(0.3),
+                                    boxShadow: profile.lastConnectionSuccess
+                                        ? [
+                                            BoxShadow(
+                                              color: AppConstants.primaryGreen
+                                                  .withOpacity(0.4),
+                                              blurRadius: 6,
+                                            ),
+                                          ]
+                                        : null,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    profile.shortLabel,
+                                    style: GoogleFonts.inter(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              '${profile.username}@${profile.host}:${profile.port}',
+                              style: GoogleFonts.jetBrainsMono(
+                                fontSize: 12,
+                                color: Colors.white.withOpacity(0.5),
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              _authTypeLabel(profile.authType),
+                              style: GoogleFonts.inter(
+                                fontSize: 11,
+                                color: accent.withOpacity(0.8),
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                      // Tap to connect arrow
+                      Icon(
+                        Icons.chevron_right,
+                        color: Colors.white.withOpacity(0.2),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              // Tap to connect arrow
-              Icon(
-                Icons.chevron_right,
-                color: Colors.white.withOpacity(0.3),
-              ),
-            ],
+            ),
           ),
         ),
       ),
-    );
+    )
+        .animate()
+        .fadeIn(duration: 400.ms, curve: Curves.easeOut)
+        .slideY(begin: 0.05, end: 0, duration: 350.ms, curve: Curves.easeOut);
   }
 
   String _authTypeLabel(AuthType type) {
     switch (type) {
       case AuthType.password:
-        return '🔑 Password';
+        return 'Password';
       case AuthType.publicKey:
-        return '🔐 Public Key';
+        return 'Public Key';
       case AuthType.passwordAndPublicKey:
-        return '🔑🔐 Password + Key';
+        return 'Password + Key';
     }
   }
 }

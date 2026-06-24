@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dartssh2/dartssh2.dart' as dartssh2;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -58,7 +60,9 @@ class KeyService extends ChangeNotifier {
     final parsed = parsedPairs.first;
 
     // dartssh2's SSHKeyPair exposes the public key via toPublicKey().
-    final publicKey = parsed.toPublicKey();
+    final hostKey = parsed.toPublicKey();
+    final publicKeyType = parsed.type;
+    final publicKey = '$publicKeyType ${base64.encode(hostKey.encode())}';
 
     // Determine key type from the algorithm identifier.
     final type = parsed.type.toLowerCase();

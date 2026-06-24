@@ -11,6 +11,10 @@ class QuickCommand extends HiveObject {
   int colorIndex;
   DateTime createdAt;
 
+  /// Optional reference to an [AgentPreset] id, for icon/color lookup.
+  /// Null for custom user-created commands.
+  String? presetId;
+
   QuickCommand({
     required this.id,
     required this.label,
@@ -18,6 +22,7 @@ class QuickCommand extends HiveObject {
     this.profileId,
     this.colorIndex = 0,
     DateTime? createdAt,
+    this.presetId,
   }) : createdAt = createdAt ?? DateTime.now();
 
   QuickCommand copyWith({
@@ -25,6 +30,7 @@ class QuickCommand extends HiveObject {
     String? command,
     String? profileId,
     int? colorIndex,
+    String? presetId,
   }) {
     return QuickCommand(
       id: id,
@@ -33,6 +39,7 @@ class QuickCommand extends HiveObject {
       profileId: profileId ?? this.profileId,
       colorIndex: colorIndex ?? this.colorIndex,
       createdAt: createdAt,
+      presetId: presetId ?? this.presetId,
     );
   }
 }

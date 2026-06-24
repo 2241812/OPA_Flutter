@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:dartssh2/dartssh2.dart' as dartssh2;
@@ -44,9 +45,15 @@ class SshService extends ChangeNotifier {
   SshConnectionState _state = SshConnectionState.disconnected;
   String? _errorMessage;
 
+  // PTY dimension tracking (last known cols/rows).
+  int _currentCols = 80;
+  int _currentRows = 24;
+
   SshConnectionState get state => _state;
   String? get errorMessage => _errorMessage;
   bool get isConnected => _state == SshConnectionState.connected;
+  int get currentCols => _currentCols;
+  int get currentRows => _currentRows;
 
   /// Connect to a remote host using the given profile.
   ///
@@ -110,9 +117,9 @@ class SshService extends ChangeNotifier {
       notifyListeners();
       await _safeClose();
       rethrow;
-    } on dartssh2.SSHSocketException catch (e) {
+    } on SocketException catch (e) {
       _state = SshConnectionState.error;
-      _errorMessage = 'Connection failed: ${e.message}';
+      _errorMessage = 'Connection failed: $e';
       notifyListeners();
       await _safeClose();
       rethrow;
@@ -129,12 +136,15 @@ class SshService extends ChangeNotifier {
   ///
   /// Returns an [SshSession] with stdout stream and stdin sink wired up.
   Future<SshSession> startShell({
-    int cols = 80,
-    int rows = 24,
+    required int cols,
+    required int rows,
   }) async {
     if (_client == null) {
       throw StateError('Not connected. Call connect() first.');
     }
+
+    _currentCols = cols;
+    _currentRows = rows;
 
     _session = await _client!.shell(
       pty: dartssh2.SSHPtyConfig(
@@ -142,9 +152,6 @@ class SshService extends ChangeNotifier {
         width: cols,
         height: rows,
       ),
-      environment: {
-        'TERM': AppConstants.defaultTermEnv,
-      },
     );
 
     return SshSession(client: _client!, session: _session!);
@@ -162,6 +169,8 @@ class SshService extends ChangeNotifier {
 
   /// Resize the PTY when the terminal view changes size.
   void resizeShell({required int cols, required int rows}) {
+    _currentCols = cols;
+    _currentRows = rows;
     _session?.resizeTerminal(cols, rows);
   }
 
