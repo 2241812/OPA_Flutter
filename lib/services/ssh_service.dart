@@ -138,6 +138,8 @@ class SshService extends ChangeNotifier {
   Future<SshSession> startShell({
     required int cols,
     required int rows,
+    int pixelWidth = 0,
+    int pixelHeight = 0,
   }) async {
     if (_client == null) {
       throw StateError('Not connected. Call connect() first.');
@@ -151,6 +153,8 @@ class SshService extends ChangeNotifier {
         type: AppConstants.defaultTermEnv,
         width: cols,
         height: rows,
+        pixelWidth: pixelWidth,
+        pixelHeight: pixelHeight,
       ),
     );
 
@@ -168,10 +172,15 @@ class SshService extends ChangeNotifier {
   }
 
   /// Resize the PTY when the terminal view changes size.
-  void resizeShell({required int cols, required int rows}) {
+  void resizeShell({
+    required int cols,
+    required int rows,
+    int pixelWidth = 0,
+    int pixelHeight = 0,
+  }) {
     _currentCols = cols;
     _currentRows = rows;
-    _session?.resizeTerminal(cols, rows);
+    _session?.resizeTerminal(cols, rows, pixelWidth, pixelHeight);
   }
 
   /// Disconnect and clean up all resources.

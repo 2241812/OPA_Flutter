@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:typed_data';
 import 'dart:ui';
 
@@ -44,6 +45,14 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen>
   // Last calculated available size (to detect orientation changes).
   Size _lastTerminalSize = Size.zero;
 
+  // True once the shell has been opened; prevents opening it before the
+  // TerminalView has been laid out (which would send wrong cols/rows).
+  bool _shellStarted = false;
+
+  // Accumulates raw bytes from the remote until a complete UTF-8 sequence is
+  // available, so multi-byte characters split across packets aren't mangled.
+  final BytesBuilder _utf8Buffer = BytesBuilder();
+
   @override
   void initState() {
     super.initState();
@@ -51,6 +60,28 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen>
 
     _terminal = Terminal();
     _terminalController = TerminalController();
+
+    // TerminalView (autoResize) calls terminal.resize() once laid out, which
+    // fires onResize with the real cols/rows. We use that to open the PTY
+    // shell with correct dimensions instead of a stale 80×24 default.
+    _terminal.onResize = (width, height, pixelWidth, pixelHeight) {
+      // If the shell isn't open yet, this is the post-layout signal we wait
+      // for. Otherwise, propagate live resizes to the remote PTY.
+      if (_shellStarted) {
+        if (width > 0 && height > 0) {
+          ref
+              .read(sshServiceProvider)
+              .resizeShell(
+                cols: width,
+                rows: height,
+                pixelWidth: pixelWidth,
+                pixelHeight: pixelHeight,
+              );
+        }
+      } else {
+        _maybeStartShell();
+      }
+    };
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _connect();
@@ -143,47 +174,18 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen>
       _terminal.write(
           '\x1b[32m✓ Connected to ${profile.displayName}\x1b[0m\r\n\r\n');
 
-      // Use current terminal dimensions for initial PTY (xterm computes
-      // cols/rows once the TerminalView is laid out).
-      final session = await sshService.startShell(
-        cols: _terminal.viewWidth > 0 ? _terminal.viewWidth : 80,
-        rows: _terminal.viewHeight > 0 ? _terminal.viewHeight : 24,
-      );
-
-      _stdoutSub = session.stdout.listen(
-        (data) {
-          if (mounted) {
-            _terminal.write(String.fromCharCodes(data));
-          }
-        },
-        onDone: () {
-          if (mounted) {
-            _terminal.write('\r\n\x1b[33m⚡ Connection closed\x1b[0m\r\n');
-            setState(() => _isConnected = false);
-          }
-        },
-        onError: (e) {
-          if (mounted) {
-            _terminal.write('\r\n\x1b[31m✗ Error: $e\x1b[0m\r\n');
-            setState(() => _isConnected = false);
-          }
-        },
-      );
-
-      _terminal.onOutput = (String data) {
-        session.stdinSink.add(Uint8List.fromList(data.codeUnits));
-      };
-
-      _terminal.onResize = (width, height, pixelWidth, pixelHeight) {
-        sshService.resizeShell(cols: width, rows: height);
-      };
-
       setState(() {
         _isConnected = true;
         _isConnecting = false;
       });
 
       await storage.updateConnectionStatus(profile.id, true);
+
+      // Defer opening the PTY shell until the TerminalView has been laid out,
+      // so we send the real cols/rows instead of a wrong 80×24 default. This
+      // prevents TUI apps (opencode/agy) from drawing to stale dimensions and
+      // leaving a blank/frozen screen.
+      _maybeStartShell();
     } catch (e) {
       if (mounted) {
         _terminal.write('\r\n\x1b[31m✗ Connection failed:\x1b[0m $e\r\n\r\n');
@@ -199,9 +201,103 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen>
     }
   }
 
+  /// Opens the SSH shell once the terminal has real dimensions. Called both
+  /// after a successful connect and from the TerminalView's onSize callback.
+  void _maybeStartShell() {
+    if (_shellStarted || !_isConnected) return;
+
+    final cols = _terminal.viewWidth;
+    final rows = _terminal.viewHeight;
+    // Wait until the view reports non-zero dimensions (post-layout).
+    if (cols <= 0 || rows <= 0) {
+      return;
+    }
+
+    _shellStarted = true;
+    _startShell(cols, rows);
+  }
+
+  Future<void> _startShell(int cols, int rows) async {
+    final sshService = ref.read(sshServiceProvider);
+
+    // Estimate pixel dimensions from the font size so TUIs that rely on
+    // pixel-based layout get reasonable values.
+    final charHeight = _fontSize;
+    final charWidth = _fontSize * AppConstants.charWidthRatio;
+    final pixelWidth = (cols * charWidth).round();
+    final pixelHeight = (rows * charHeight).round();
+
+    try {
+      final session = await sshService.startShell(
+        cols: cols,
+        rows: rows,
+        pixelWidth: pixelWidth,
+        pixelHeight: pixelHeight,
+      );
+
+      _stdoutSub = session.stdout.listen(
+        (data) {
+          if (mounted) {
+            _writeBytesToTerminal(data);
+          }
+        },
+        onDone: () {
+          if (mounted) {
+            // Flush any buffered bytes before showing the closed message.
+            _flushUtf8Buffer();
+            _terminal.write('\r\n\x1b[33m⚡ Connection closed\x1b[0m\r\n');
+            setState(() => _isConnected = false);
+          }
+        },
+        onError: (e) {
+          if (mounted) {
+            _flushUtf8Buffer();
+            _terminal.write('\r\n\x1b[31m✗ Error: $e\x1b[0m\r\n');
+            setState(() => _isConnected = false);
+          }
+        },
+      );
+
+      _terminal.onOutput = (String data) {
+        session.stdinSink.add(Uint8List.fromList(utf8.encode(data)));
+      };
+
+      // NOTE: _terminal.onResize is wired in initState() and handles both the
+      // initial shell-open trigger and live resizes. Not reassigned here.
+    } catch (e) {
+      if (mounted) {
+        _terminal.write('\r\n\x1b[31m✗ Shell error:\x1b[0m $e\r\n');
+        setState(() => _isConnected = false);
+      }
+    }
+  }
+
+  /// Decodes raw SSH stdout bytes as UTF-8 and writes them to the terminal.
+  ///
+  /// Bytes are accumulated in [_utf8Buffer] because a multi-byte UTF-8
+  /// sequence (e.g. a box-drawing char used by opencode/agy) can be split
+  /// across two packets. Decoding only the complete prefix avoids the
+  /// garbled-text bug that `String.fromCharCodes(data)` caused.
+  void _writeBytesToTerminal(Uint8List data) {
+    _utf8Buffer.add(data);
+    final bytes = _utf8Buffer.takeBytes();
+    final decoded = utf8.decode(bytes, allowMalformed: true);
+    _terminal.write(decoded);
+  }
+
+  /// Writes any remaining buffered bytes to the terminal (call on close).
+  void _flushUtf8Buffer() {
+    if (_utf8Buffer.isEmpty) return;
+    final bytes = _utf8Buffer.takeBytes();
+    _terminal.write(utf8.decode(bytes, allowMalformed: true));
+  }
+
   void _disconnect() async {
     await ref.read(sshServiceProvider).disconnect();
     _stdoutSub?.cancel();
+    _stdoutSub = null;
+    _shellStarted = false;
+    _utf8Buffer.takeBytes(); // discard any buffered bytes
     setState(() => _isConnected = false);
   }
 
