@@ -13,6 +13,7 @@ import '../services/key_service.dart';
 import '../services/profile_storage_service.dart';
 import '../services/ssh_service.dart';
 import '../utils/constants.dart';
+import '../utils/app_version.dart';
 
 /// Full-screen terminal screen connected to an SSH session.
 ///
@@ -145,8 +146,9 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen>
       _error = null;
     });
 
+    final version = await AppVersion.get();
     _terminal.write(
-      '\x1b[1;32m⬡ OPA — OpenSSH Pocket Agent v${AppConstants.appVersion}\x1b[0m\r\n\r\n'
+      '\x1b[1;32m⬡ OPA — OpenSSH Pocket Agent v$version\x1b[0m\r\n\r\n'
       '\x1b[33mConnecting...\x1b[0m\r\n',
     );
 

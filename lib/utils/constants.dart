@@ -6,7 +6,6 @@ class AppConstants {
 
   static const String appName = 'OPA';
   static const String appFullTitle = 'OpenSSH Pocket Agent';
-  static const String appVersion = '0.2.0';
 
   // Hive box names
   static const String profilesBox = 'connection_profiles';

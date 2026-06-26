@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
+import '../utils/app_version.dart';
 import '../utils/constants.dart';
 
 /// Holds information about a pending app update from GitHub Releases.
@@ -47,7 +48,11 @@ class UpdateService {
       // Strip leading 'v' if present (e.g. "v0.3.0" → "0.3.0").
       final remoteVersion = tagName.replaceFirst(RegExp(r'^v'), '');
 
-      if (!_isNewer(remoteVersion, AppConstants.appVersion)) return null;
+      // Read the actually-installed version at runtime (from the APK's
+      // package info) rather than a hardcoded constant, so the comparison
+      // matches whatever build the user is running.
+      final installedVersion = await AppVersion.get();
+      if (!_isNewer(remoteVersion, installedVersion)) return null;
 
       // Find the first APK asset in the release.
       final assets = body['assets'] as List<dynamic>?;
