@@ -438,11 +438,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final accent = const Color(0xFFFFAB40);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 3),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(10),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-          child: Container(
+      child: Container(
             decoration: BoxDecoration(
               color: AppConstants.surfaceDark.withOpacity(0.5),
               borderRadius: BorderRadius.circular(10),
@@ -505,8 +501,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             ),
           ),
-        ),
-      ),
     );
   }
 

@@ -187,21 +187,32 @@ class _ProfileEditorScreenState extends ConsumerState<ProfileEditorScreen> {
 
             // Auth type selector
             SegmentedButton<AuthType>(
+              style: const ButtonStyle(
+                // Shrink icon + label so icon + 'Password'/'Key'/'Both' fit
+                // within a third-width segment without overflowing.
+                iconSize: WidgetStatePropertyAll(14),
+                textStyle: WidgetStatePropertyAll(
+                  TextStyle(fontSize: 12),
+                ),
+                padding: WidgetStatePropertyAll(
+                  EdgeInsets.symmetric(horizontal: 8),
+                ),
+              ),
               segments: const [
                 ButtonSegment(
                   value: AuthType.password,
                   label: Text('Password'),
-                  icon: Icon(Icons.password_rounded, size: 16),
+                  icon: Icon(Icons.password_rounded, size: 14),
                 ),
                 ButtonSegment(
                   value: AuthType.publicKey,
                   label: Text('Key'),
-                  icon: Icon(Icons.vpn_key_rounded, size: 16),
+                  icon: Icon(Icons.vpn_key_rounded, size: 14),
                 ),
                 ButtonSegment(
                   value: AuthType.passwordAndPublicKey,
                   label: Text('Both'),
-                  icon: Icon(Icons.lock_rounded, size: 16),
+                  icon: Icon(Icons.lock_rounded, size: 14),
                 ),
               ],
               selected: {_authType},

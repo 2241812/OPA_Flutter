@@ -86,13 +86,15 @@ class _QuickCommandsScreenState extends ConsumerState<QuickCommandsScreen> {
                 ],
               ),
             ),
-            ...commands.map((cmd) {
+            ...() {
               final profiles = storage.listProfiles();
-              final profile = cmd.profileId != null
-                  ? profiles.where((p) => p.id == cmd.profileId).firstOrNull
-                  : null;
-              return _buildCommandCard(cmd, profile);
-            }),
+              return commands.map((cmd) {
+                final profile = cmd.profileId != null
+                    ? profiles.where((p) => p.id == cmd.profileId).firstOrNull
+                    : null;
+                return _buildCommandCard(cmd, profile);
+              });
+            }(),
           ],
         ],
       ),
@@ -121,11 +123,7 @@ class _QuickCommandsScreenState extends ConsumerState<QuickCommandsScreen> {
   Widget _buildInfoBanner() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-          child: Container(
+      child: Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
               color: const Color(0xFFFFAB40).withOpacity(0.06),
@@ -164,8 +162,6 @@ class _QuickCommandsScreenState extends ConsumerState<QuickCommandsScreen> {
               ],
             ),
           ),
-        ),
-      ),
     )
         .animate()
         .fadeIn(duration: 400.ms, curve: Curves.easeOut)
@@ -242,19 +238,7 @@ class _QuickCommandsScreenState extends ConsumerState<QuickCommandsScreen> {
             separatorBuilder: (_, __) => const SizedBox(width: 10),
             itemBuilder: (context, index) {
               final preset = presets[index];
-              return _buildPresetChip(preset, profiles)
-                  .animate()
-                  .fadeIn(
-                    duration: 350.ms,
-                    delay: Duration(milliseconds: index * 40),
-                    curve: Curves.easeOut,
-                  )
-                  .scale(
-                    begin: const Offset(0.9, 0.9),
-                    duration: 350.ms,
-                    delay: Duration(milliseconds: index * 40),
-                    curve: Curves.easeOut,
-                  );
+              return _buildPresetChip(preset, profiles);
             },
           ),
         ),
@@ -474,11 +458,7 @@ class _QuickCommandsScreenState extends ConsumerState<QuickCommandsScreen> {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(14),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-          child: Container(
+      child: Container(
             decoration: BoxDecoration(
               color: AppConstants.surfaceDark.withOpacity(0.7),
               borderRadius: BorderRadius.circular(14),
@@ -591,12 +571,7 @@ class _QuickCommandsScreenState extends ConsumerState<QuickCommandsScreen> {
               ),
             ),
           ),
-        ),
-      ),
-    )
-        .animate()
-        .fadeIn(duration: 400.ms, curve: Curves.easeOut)
-        .slideY(begin: 0.05, end: 0, duration: 350.ms, curve: Curves.easeOut);
+    );
   }
 
   // ── Command execution ────────────────────────────────────────────

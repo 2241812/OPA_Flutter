@@ -1,7 +1,4 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../models/connection_profile.dart';
@@ -44,11 +41,7 @@ class ConnectionCard extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(14),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-          child: Container(
+      child: Container(
             decoration: BoxDecoration(
               color: AppConstants.surfaceDark.withOpacity(0.7),
               borderRadius: BorderRadius.circular(14),
@@ -163,12 +156,7 @@ class ConnectionCard extends StatelessWidget {
               ),
             ),
           ),
-        ),
-      ),
-    )
-        .animate()
-        .fadeIn(duration: 400.ms, curve: Curves.easeOut)
-        .slideY(begin: 0.05, end: 0, duration: 350.ms, curve: Curves.easeOut);
+    );
   }
 
   String _authTypeLabel(AuthType type) {

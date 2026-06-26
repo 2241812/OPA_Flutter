@@ -1,7 +1,4 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../models/stored_key_pair.dart';
@@ -30,11 +27,7 @@ class KeyCard extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(14),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-          child: Container(
+      child: Container(
             decoration: BoxDecoration(
               color: AppConstants.surfaceDark.withOpacity(0.7),
               borderRadius: BorderRadius.circular(14),
@@ -146,12 +139,7 @@ class KeyCard extends StatelessWidget {
               ),
             ),
           ),
-        ),
-      ),
-    )
-        .animate()
-        .fadeIn(duration: 400.ms, curve: Curves.easeOut)
-        .slideY(begin: 0.05, end: 0, duration: 350.ms, curve: Curves.easeOut);
+    );
   }
 
   String _truncatedPublicKey(String key) {

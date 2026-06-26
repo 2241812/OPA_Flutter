@@ -113,11 +113,7 @@ class _KeyManagementScreenState extends ConsumerState<KeyManagementScreen> {
   Widget _buildInfoBanner() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-          child: Container(
+      child: Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
               color: AppConstants.primaryGreen.withOpacity(0.06),
@@ -156,8 +152,6 @@ class _KeyManagementScreenState extends ConsumerState<KeyManagementScreen> {
               ],
             ),
           ),
-        ),
-      ),
     )
         .animate()
         .fadeIn(duration: 400.ms, curve: Curves.easeOut)
