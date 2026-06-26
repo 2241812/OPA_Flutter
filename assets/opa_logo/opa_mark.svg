@@ -1,0 +1,20 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">OPA logo mark</title>
+  <desc id="desc">Hexagonal pocket terminal logo with SSH key, command prompt, and agent network cues.</desc>
+  <path d="M512 92 L875.73 302 L875.73 722 L512 932 L148.27 722 L148.27 302 Z" fill="#07110F" stroke="#21F6A2" stroke-width="26" stroke-linejoin="round"/>
+  <path d="M512 142 L832.43 327 L832.43 697 L512 882 L191.57 697 L191.57 327 Z" stroke="#102D25" stroke-width="8" stroke-linejoin="round"/>
+  <rect x="318" y="230" width="388" height="532" rx="76" fill="#0B1D18" stroke="#8AF5CE" stroke-width="14"/>
+  <rect x="372" y="278" width="280" height="426" rx="44" stroke="#102D25" stroke-width="10"/>
+  <rect x="454" y="265" width="116" height="19" rx="9" fill="#102D25"/>
+  <circle cx="384" cy="499" r="68" stroke="#21F6A2" stroke-width="34"/>
+  <circle cx="384" cy="499" r="24" fill="#07110F"/>
+  <path d="M452 499 H536 M525 499 V548 M562 499 V534" stroke="#21F6A2" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M505 414 L631 512 L505 610" stroke="#21F6A2" stroke-width="42" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M626 616 H756" stroke="#26D8F0" stroke-width="34" stroke-linecap="round"/>
+  <path d="M610 380 H682 L724 434" stroke="#26D8F0" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="610" cy="380" r="20" fill="#26D8F0"/>
+  <circle cx="682" cy="380" r="18" fill="#21F6A2"/>
+  <circle cx="724" cy="434" r="20" fill="#26D8F0"/>
+  <path d="M402 672 L462 714 H534" stroke="#8AF5CE" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="494" y="720" width="36" height="18" rx="9" fill="#102D25"/>
+</svg>

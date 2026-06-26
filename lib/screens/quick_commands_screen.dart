@@ -37,6 +37,13 @@ class _QuickCommandsScreenState extends ConsumerState<QuickCommandsScreen> {
           'Quick Commands',
           style: GoogleFonts.inter(fontWeight: FontWeight.w600),
         ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.tune_rounded, size: 20),
+            tooltip: 'Edit Presets',
+            onPressed: () => context.push('/presets'),
+          ),
+        ],
       ),
       body: ListView(
         padding: const EdgeInsets.only(top: 4, bottom: 100),

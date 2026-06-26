@@ -187,6 +187,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             tooltip: 'Quick Commands',
             onPressed: () => context.push('/commands'),
           ),
+          IconButton(
+            icon: Icon(
+              Icons.settings_rounded,
+              color: Colors.white.withOpacity(0.6),
+            ),
+            tooltip: 'Settings',
+            onPressed: () => context.push('/settings'),
+          ),
           const SizedBox(width: 4),
         ],
       ),

@@ -1,5 +1,5 @@
 ﻿name: opa
-description: OPA â€” OpenSSH Pocket Agent. A Flutter app that makes SSH connectivity effortless.
+description: OPA - OpenSSH Pocket Agent. A Flutter app that makes SSH connectivity effortless.
 version: 0.2.2+4
 
 environment:
@@ -9,10 +9,10 @@ dependencies:
   flutter:
     sdk: flutter
 
-  # SSH client â€” password + key auth, keep-alive, port forwarding, built-in SFTP
+  # SSH client - password + key auth, keep-alive, port forwarding, built-in SFTP
   dartssh2: ^2.8.0
 
-  # Terminal emulator widget â€” VT100, 256-color, scrollback, touch
+  # Terminal emulator widget - VT100, 256-color, scrollback, touch
   xterm: ^4.0.0
 
   # Ed25519 key pair generation (used by ssh_key_encoder.dart)
@@ -37,13 +37,13 @@ dependencies:
   # Onboarding first-launch detection
   shared_preferences: ^2.3.0
 
-  # Typography â€” JetBrains Mono (terminal) + Inter (UI)
+  # Typography - JetBrains Mono (terminal) + Inter (UI)
   google_fonts: ^6.2.0
 
   # Declarative spring/fade animations
   flutter_animate: ^4.5.0
 
-  # HTTP client â€” GitHub Releases API for update checks
+  # HTTP client - GitHub Releases API for update checks
   http: ^1.2.0
 
   # Launch APK download URLs in the browser
@@ -51,6 +51,9 @@ dependencies:
 
   # Read the installed app version at runtime (for update checks)
   package_info_plus: ^8.0.0
+
+  # Biometric authentication (fingerprint / face)
+  local_auth: ^2.3.0
 
 dev_dependencies:
   flutter_test:

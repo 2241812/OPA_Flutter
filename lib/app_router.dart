@@ -5,10 +5,13 @@ import 'package:go_router/go_router.dart';
 import '../services/onboarding_service.dart';
 import '../screens/home_screen.dart';
 import '../screens/onboarding_screen.dart';
+import '../screens/settings_screen.dart';
 import '../screens/terminal_screen.dart';
 import '../screens/profile_editor_screen.dart';
 import '../screens/key_management_screen.dart';
 import '../screens/quick_commands_screen.dart';
+import '../screens/sftp_screen.dart';
+import '../screens/preset_editor_screen.dart';
 
 /// Top-level route paths.
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -88,6 +91,16 @@ final goRouter = GoRouter(
       },
     ),
     GoRoute(
+      path: '/sftp/:profileId',
+      pageBuilder: (context, state) {
+        final profileId = state.pathParameters['profileId']!;
+        return _buildTransitionPage(
+          child: SftpScreen(profileId: profileId),
+          state: state,
+        );
+      },
+    ),
+    GoRoute(
       path: '/profile/new',
       pageBuilder: (context, state) => _buildTransitionPage(
         child: const ProfileEditorScreen(),
@@ -115,6 +128,20 @@ final goRouter = GoRouter(
       path: '/commands',
       pageBuilder: (context, state) => _buildTransitionPage(
         child: const QuickCommandsScreen(),
+        state: state,
+      ),
+    ),
+    GoRoute(
+      path: '/presets',
+      pageBuilder: (context, state) => _buildTransitionPage(
+        child: const PresetEditorScreen(),
+        state: state,
+      ),
+    ),
+    GoRoute(
+      path: '/settings',
+      pageBuilder: (context, state) => _buildTransitionPage(
+        child: const SettingsScreen(),
         state: state,
       ),
     ),

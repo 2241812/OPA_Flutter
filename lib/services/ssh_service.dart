@@ -55,14 +55,19 @@ class SshService extends ChangeNotifier {
   int get currentCols => _currentCols;
   int get currentRows => _currentRows;
 
+  /// The underlying dartssh2 SSHClient, or null if not connected.
+  dartssh2.SSHClient? get client => _client;
+
   /// Connect to a remote host using the given profile.
   ///
   /// [privateKey] is the OpenSSH-formatted private key PEM string, used for
-  /// key-based auth. Returns the established dartssh2.SSHClient.
+  /// key-based auth. [keepalive] overrides the default keepalive interval.
+  /// Returns the established dartssh2.SSHClient.
   Future<dartssh2.SSHClient> connect({
     required ConnectionProfile profile,
     String? privateKey,
     String? password,
+    Duration? keepalive,
   }) async {
     _state = SshConnectionState.connecting;
     _errorMessage = null;
@@ -91,7 +96,7 @@ class SshService extends ChangeNotifier {
       _client = dartssh2.SSHClient(
         socket,
         username: profile.username,
-        keepAliveInterval: AppConstants.defaultKeepAlive,
+        keepAliveInterval: keepalive ?? AppConstants.defaultKeepAlive,
         identities: identities ?? const [],
         onPasswordRequest: effectivePassword == null
             ? null

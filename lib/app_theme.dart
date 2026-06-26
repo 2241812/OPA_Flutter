@@ -7,11 +7,14 @@ import 'utils/constants.dart';
 class AppTheme {
   AppTheme._();
 
-  static ThemeData dark() {
+  static ThemeData dark({bool amoledBlack = false}) {
+    final bgColor = amoledBlack ? Colors.black : AppConstants.backgroundDark;
+    final surfaceColor = amoledBlack ? Colors.black : AppConstants.surfaceDark;
+
     final colorScheme = ColorScheme.fromSeed(
       seedColor: AppConstants.primaryGreen,
       brightness: Brightness.dark,
-      surface: AppConstants.surfaceDark,
+      surface: surfaceColor,
     );
 
     // Typography — Inter for UI, JetBrains Mono for terminal/code.
@@ -25,9 +28,9 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       colorScheme: colorScheme,
-      scaffoldBackgroundColor: AppConstants.backgroundDark,
+      scaffoldBackgroundColor: bgColor,
       appBarTheme: AppBarTheme(
-        backgroundColor: AppConstants.surfaceDark,
+        backgroundColor: surfaceColor,
         foregroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
@@ -42,7 +45,7 @@ class AppTheme {
         surfaceTintColor: Colors.transparent,
       ),
       cardTheme: CardThemeData(
-        color: AppConstants.surfaceDark.withOpacity(0.8),
+        color: surfaceColor.withOpacity(0.8),
         elevation: 2,
         shadowColor: AppConstants.primaryGreen.withOpacity(0.05),
         shape: RoundedRectangleBorder(
@@ -142,7 +145,7 @@ class AppTheme {
         thickness: 1,
       ),
       snackBarTheme: SnackBarThemeData(
-        backgroundColor: AppConstants.surfaceDark,
+        backgroundColor: surfaceColor,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
@@ -153,7 +156,7 @@ class AppTheme {
         elevation: 4,
       ),
       bottomSheetTheme: BottomSheetThemeData(
-        backgroundColor: AppConstants.surfaceDark.withOpacity(0.95),
+        backgroundColor: surfaceColor.withOpacity(0.95),
         modalBarrierColor: Colors.black54,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -161,7 +164,7 @@ class AppTheme {
         elevation: 8,
       ),
       dialogTheme: DialogThemeData(
-        backgroundColor: AppConstants.surfaceDark,
+        backgroundColor: surfaceColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
           side: BorderSide(
@@ -180,7 +183,7 @@ class AppTheme {
         ),
       ),
       popupMenuTheme: PopupMenuThemeData(
-        color: AppConstants.surfaceDark,
+        color: surfaceColor,
         elevation: 6,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),

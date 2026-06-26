@@ -6,6 +6,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:xterm/xterm.dart';
 
@@ -14,6 +15,7 @@ import '../services/profile_storage_service.dart';
 import '../services/ssh_service.dart';
 import '../utils/constants.dart';
 import '../utils/app_version.dart';
+import '../utils/terminal_settings_provider.dart';
 
 /// Full-screen terminal screen connected to an SSH session.
 ///
@@ -59,7 +61,10 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
 
-    _terminal = Terminal();
+    _fontSize = ref.read(terminalFontSizeProvider);
+    final scrollbackLines = ref.read(terminalScrollbackProvider);
+
+    _terminal = Terminal(maxLines: scrollbackLines);
     _terminalController = TerminalController();
 
     // TerminalView (autoResize) calls terminal.resize() once laid out, which
@@ -171,6 +176,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen>
         profile: profile,
         privateKey: privateKey,
         password: profile.password,
+        keepalive: Duration(seconds: ref.read(terminalKeepaliveProvider)),
       );
 
       _terminal.write(
@@ -481,6 +487,11 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen>
         style: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w600),
       ),
       actions: [
+        IconButton(
+          icon: const Icon(Icons.folder_open_rounded, size: 20),
+          tooltip: 'SFTP Browser',
+          onPressed: () => context.push('/sftp/${widget.profileId}'),
+        ),
         IconButton(
           icon: const Icon(Icons.zoom_out_rounded, size: 20),
           tooltip: 'Zoom out',

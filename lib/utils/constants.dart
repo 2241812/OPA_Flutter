@@ -18,6 +18,9 @@ class AppConstants {
   // Onboarding
   static const String onboardingCompleteKey = 'opa_onboarding_complete';
 
+  // Biometric lock
+  static const String biometricLockEnabledKey = 'opa_biometric_lock_enabled';
+
   // GitHub repository — used for update checks via Releases API
   static const String gitHubOwner = '2241812';
   static const String gitHubRepo = 'OPA_Flutter';
