@@ -1,4 +1,3 @@
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -22,12 +21,16 @@ class HomeScreen extends ConsumerStatefulWidget {
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> with SingleTickerProviderStateMixin {
   bool _updateChecked = false;
 
   @override
   void initState() {
     super.initState();
+    _menuAnimCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 250),
+    );
     _checkForUpdate();
   }
 
@@ -375,22 +378,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ],
         ),
       ),
-      floatingActionButton: Container(
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: AppConstants.primaryGreen.withOpacity(0.25),
-              blurRadius: 16,
-              spreadRadius: 2,
+      floatingActionButton: Stack(
+        alignment: Alignment.bottomRight,
+        children: [
+          ..._buildMenuActions(),
+          FloatingActionButton(
+            onPressed: _toggleMenu,
+            child: AnimatedRotation(
+              turns: _menuOpen ? 0.375 : 0,
+              duration: const Duration(milliseconds: 200),
+              child: const Icon(Icons.add_rounded),
             ),
-          ],
-        ),
-        child: FloatingActionButton(
-          onPressed: _showAddMenu,
-          tooltip: 'Add',
-          child: const Icon(Icons.add_rounded),
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -520,128 +520,104 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     context.push('/profile/${profile.id}');
   }
 
-  void _showAddMenu() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => ClipRRect(
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-          child: Container(
-            decoration: BoxDecoration(
-              color: AppConstants.surfaceDark.withOpacity(0.9),
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(20)),
-              border: Border(
-                top: BorderSide(
-                  color: AppConstants.primaryGreen.withOpacity(0.15),
-                  width: 1,
-                ),
-                left: BorderSide(
-                  color: Colors.white.withOpacity(0.04),
-                ),
-                right: BorderSide(
-                  color: Colors.white.withOpacity(0.04),
-                ),
-              ),
-            ),
-            child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Drag handle
-                    Container(
-                      width: 36,
-                      height: 4,
-                      margin: const EdgeInsets.only(bottom: 12),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                    ListTile(
-                      leading: Container(
-                        width: 36,
-                        height: 36,
-                        decoration: BoxDecoration(
-                          color:
-                              AppConstants.primaryGreen.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Icon(
-                          Icons.add_circle_outline_rounded,
-                          color: AppConstants.primaryGreen,
-                          size: 20,
-                        ),
-                      ),
-                      title: Text(
-                        'New Connection',
-                        style: GoogleFonts.inter(
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      onTap: () {
-                        Navigator.pop(context);
-                        context.push('/profile/new');
-                      },
-                    ),
-                    ListTile(
-                      leading: Container(
-                        width: 36,
-                        height: 36,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF448AFF).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Icon(
-                          Icons.vpn_key_rounded,
-                          color: Color(0xFF448AFF),
-                          size: 20,
-                        ),
-                      ),
-                      title: Text(
-                        'Generate SSH Key',
-                        style: GoogleFonts.inter(
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      onTap: () {
-                        Navigator.pop(context);
-                        context.push('/keys');
-                      },
-                    ),
-                    ListTile(
-                      leading: Container(
-                        width: 36,
-                        height: 36,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFFAB40).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Icon(
-                          Icons.flash_on_rounded,
-                          color: Color(0xFFFFAB40),
-                          size: 20,
-                        ),
-                      ),
-                      title: Text(
-                        'Quick Command',
-                        style: GoogleFonts.inter(
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      onTap: () {
-                        Navigator.pop(context);
-                        context.push('/commands');
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ),
+  /// Whether the FAB expansion menu is open.
+  bool _menuOpen = false;
+
+  /// Animation controller for FAB menu items.
+  late final AnimationController _menuAnimCtrl;
+
+
+  @override
+  void dispose() {
+    _menuAnimCtrl.dispose();
+    super.dispose();
+  }
+
+  void _toggleMenu() {
+    setState(() {
+      _menuOpen = !_menuOpen;
+      if (_menuOpen) {
+        _menuAnimCtrl.forward();
+      } else {
+        _menuAnimCtrl.reverse();
+      }
+    });
+  }
+
+  List<Widget> _buildMenuActions() {
+    return [
+      _MenuItem(
+        animCtrl: _menuAnimCtrl,
+        index: 2,
+        icon: Icons.flash_on_rounded,
+        color: const Color(0xFFFFAB40),
+        label: 'Quick Command',
+        onTap: () => context.push('/commands'),
+      ),
+      _MenuItem(
+        animCtrl: _menuAnimCtrl,
+        index: 1,
+        icon: Icons.vpn_key_rounded,
+        color: const Color(0xFF448AFF),
+        label: 'Generate SSH Key',
+        onTap: () => context.push('/keys'),
+      ),
+      _MenuItem(
+        animCtrl: _menuAnimCtrl,
+        index: 0,
+        icon: Icons.add_circle_outline_rounded,
+        color: AppConstants.primaryGreen,
+        label: 'New Connection',
+        onTap: () => context.push('/profile/new'),
+      ),
+    ];
+  }
+}
+
+
+/// A single animated FAB menu item that slides and fades in.
+class _MenuItem extends StatelessWidget {
+  final AnimationController animCtrl;
+  final int index;
+  final IconData icon;
+  final Color color;
+  final String label;
+  final VoidCallback onTap;
+
+  const _MenuItem({
+    required this.animCtrl,
+    required this.index,
+    required this.icon,
+    required this.color,
+    required this.label,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final animation = CurvedAnimation(
+      parent: animCtrl,
+      curve: Interval(
+        0.0 + index * 0.1,
+        0.3 + index * 0.1,
+        curve: Curves.easeOut,
+      ),
+    );
+    return SlideTransition(
+      position: Tween<Offset>(
+        begin: const Offset(0, 0.4),
+        end: Offset.zero,
+      ).animate(animation),
+      child: FadeTransition(
+        opacity: animation,
+        child: SizedBox(
+          width: 48,
+          height: 48,
+          child: FloatingActionButton.small(
+            heroTag: 'fab_menu_' + index.toString(),
+            backgroundColor: color.withOpacity(0.15),
+            onPressed: onTap,
+            child: Icon(icon, color: color, size: 20),
           ),
         ),
       ),

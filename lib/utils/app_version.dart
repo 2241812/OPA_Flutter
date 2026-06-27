@@ -11,7 +11,7 @@ class AppVersion {
   AppVersion._();
 
   /// Compile-time fallback used when the platform package-info lookup fails.
-  static const String _fallbackVersion = '0.2.1';
+  static const String _fallbackVersion = '0.2.3';
 
   static String? _cached;
 
