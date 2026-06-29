@@ -146,10 +146,12 @@ class _ProfileEditorScreenState extends ConsumerState<ProfileEditorScreen> {
             // Host
             TextFormField(
               controller: _hostController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Host',
-                hintText: '192.168.1.100',
-                prefixIcon: Icon(Icons.dns_rounded),
+                hintText: _connectionMethod == ConnectionMethod.tailscale
+                    ? '100.x.x.x or hostname.tailnet.ts.net'
+                    : '192.168.1.100',
+                prefixIcon: const Icon(Icons.dns_rounded),
               ),
               keyboardType: TextInputType.text,
               validator: (v) => v?.trim().isEmpty ?? true ? 'Required' : null,

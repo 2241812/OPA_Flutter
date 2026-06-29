@@ -1,5 +1,7 @@
 
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:tailscale/tailscale.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -10,6 +12,7 @@ import '../models/connection_profile.dart';
 import '../models/quick_command.dart';
 import '../services/profile_storage_service.dart';
 import '../services/update_service.dart';
+import '../services/tailscale_provider.dart';
 import '../utils/constants.dart';
 import '../widgets/connection_card.dart';
 
@@ -23,6 +26,8 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> with SingleTickerProviderStateMixin {
   bool _updateChecked = false;
+  NodeState? _tailscaleNodeState;
+  StreamSubscription<NodeState>? _tsSub;
 
   @override
   void initState() {
@@ -32,6 +37,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with SingleTickerProvid
       duration: const Duration(milliseconds: 250),
     );
     _checkForUpdate();
+    _initTailscaleSubscription();
   }
 
   Future<void> _checkForUpdate() async {
@@ -39,6 +45,55 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with SingleTickerProvid
     if (!mounted || info == null) return;
     setState(() => _updateChecked = true);
     _showUpdateDialog(info);
+  }
+
+  void _initTailscaleSubscription() {
+    try {
+      final ts = ref.read(tailscaleServiceProvider);
+      _tsSub = ts.onStateChange.listen((state) {
+        if (!mounted) return;
+        setState(() => _tailscaleNodeState = state);
+        if (state == NodeState.needsLogin) {
+          _showAuthUrl();
+        }
+      });
+    } catch (_) {
+      // Tailscale not initialized yet
+    }
+  }
+
+  Future<void> _showAuthUrl() async {
+    try {
+      final ts = ref.read(tailscaleServiceProvider);
+      final st = await ts.status();
+      if (st.authUrl != null && mounted) {
+        showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+              side: BorderSide(color: Colors.white.withOpacity(0.08)),
+            ),
+            backgroundColor: AppConstants.surfaceDark,
+            title: const Text('Tailscale Auth Required'),
+            content: Text('Open this URL in a browser to authenticate:'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  launchUrl(st.authUrl!);
+                  Navigator.pop(ctx);
+                },
+                child: const Text('Open URL'),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (_) {}
   }
 
   void _showUpdateDialog(UpdateInfo info) {
@@ -300,6 +355,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with SingleTickerProvid
               ...profiles.map(
                 (profile) => ConnectionCard(
                   profile: profile,
+                  tailscaleState: _tailscaleNodeState,
                   onTap: () => _connectTo(profile),
                   onLongPress: () => _editProfile(profile),
                 ),
@@ -529,6 +585,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with SingleTickerProvid
 
   @override
   void dispose() {
+    _tsSub?.cancel();
     _menuAnimCtrl.dispose();
     super.dispose();
   }

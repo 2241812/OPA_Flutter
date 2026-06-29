@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../models/connection_profile.dart';
+import 'package:tailscale/tailscale.dart';
 import '../utils/constants.dart';
 
 /// Color palette for connection profile cards.
@@ -29,11 +30,13 @@ class ConnectionCard extends StatelessWidget {
     required this.profile,
     this.onTap,
     this.onLongPress,
+    this.tailscaleState,
   });
 
   final ConnectionProfile profile;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
+  final NodeState? tailscaleState;
 
   @override
   Widget build(BuildContext context) {
@@ -97,10 +100,8 @@ class ConnectionCard extends StatelessWidget {
                                   height: 8,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    color: profile.lastConnectionSuccess
-                                        ? AppConstants.primaryGreen
-                                        : Colors.white.withOpacity(0.3),
-                                    boxShadow: profile.lastConnectionSuccess
+                                    color: _indicatorColor,
+                                    boxShadow: _indicatorColor == AppConstants.primaryGreen
                                         ? [
                                             BoxShadow(
                                               color: AppConstants.primaryGreen
@@ -134,13 +135,38 @@ class ConnectionCard extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 2),
-                            Text(
-                              _authTypeLabel(profile.authType),
-                              style: GoogleFonts.inter(
-                                fontSize: 11,
-                                color: accent.withOpacity(0.8),
-                                fontWeight: FontWeight.w500,
-                              ),
+                            Row(
+                              children: [
+                                Text(
+                                  _authTypeLabel(profile.authType),
+                                  style: GoogleFonts.inter(
+                                    fontSize: 11,
+                                    color: accent.withOpacity(0.8),
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                // Connection method badge
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                  decoration: BoxDecoration(
+                                    color: profile.connectionMethod == ConnectionMethod.tailscale
+                                        ? Colors.blue.withOpacity(0.15)
+                                        : Colors.white.withOpacity(0.06),
+                                    borderRadius: BorderRadius.circular(3),
+                                  ),
+                                  child: Text(
+                                    profile.connectionMethod == ConnectionMethod.tailscale ? 'TS' : 'DIRECT',
+                                    style: GoogleFonts.jetBrainsMono(
+                                      fontSize: 8,
+                                      fontWeight: FontWeight.w600,
+                                      color: profile.connectionMethod == ConnectionMethod.tailscale
+                                          ? Colors.blue.withOpacity(0.8)
+                                          : Colors.white.withOpacity(0.4),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -157,6 +183,18 @@ class ConnectionCard extends StatelessWidget {
             ),
           ),
     );
+  }
+
+  Color get _indicatorColor {
+    if (profile.connectionMethod == ConnectionMethod.tailscale) {
+      if (tailscaleState == NodeState.running) return AppConstants.primaryGreen;
+      if (tailscaleState == NodeState.needsLogin || tailscaleState == NodeState.noState) return Colors.orange;
+      if (tailscaleState == NodeState.starting) return Colors.amber;
+      return Colors.white.withOpacity(0.3);
+    }
+    return profile.lastConnectionSuccess
+        ? AppConstants.primaryGreen
+        : Colors.white.withOpacity(0.3);
   }
 
   String _authTypeLabel(AuthType type) {
