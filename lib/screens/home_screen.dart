@@ -1,5 +1,4 @@
 
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:tailscale/tailscale.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -24,20 +23,21 @@ class HomeScreen extends ConsumerStatefulWidget {
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen> with SingleTickerProviderStateMixin {
+class _HomeScreenState extends ConsumerState<HomeScreen>
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   bool _updateChecked = false;
   NodeState? _tailscaleNodeState;
-  StreamSubscription<NodeState>? _tsSub;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _menuAnimCtrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 250),
     );
     _checkForUpdate();
-    _initTailscaleSubscription();
+    _initTailscaleListener();
   }
 
   Future<void> _checkForUpdate() async {
@@ -47,19 +47,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with SingleTickerProvid
     _showUpdateDialog(info);
   }
 
-  void _initTailscaleSubscription() {
-    try {
-      final ts = ref.read(tailscaleServiceProvider);
-      _tsSub = ts.onStateChange.listen((state) {
-        if (!mounted) return;
-        setState(() => _tailscaleNodeState = state);
-        if (state == NodeState.needsLogin) {
-          _showAuthUrl();
-        }
-      });
-    } catch (_) {
-      // Tailscale not initialized yet
-    }
+  void _initTailscaleListener() {
+    ref.listen<AsyncValue<NodeState?>>(tailscaleStateProvider, (_, next) {
+      final state = next.valueOrNull;
+      if (!mounted) return;
+      setState(() => _tailscaleNodeState = state);
+      if (state == NodeState.needsLogin) {
+        _showAuthUrl();
+      }
+    });
   }
 
   Future<void> _showAuthUrl() async {
@@ -92,6 +88,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with SingleTickerProvid
             ],
           ),
         );
+      }
+    } catch (_) {}
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _autoRetryTailscale();
+    }
+  }
+
+  Future<void> _autoRetryTailscale() async {
+    try {
+      final ts = ref.read(tailscaleServiceProvider);
+      if (!ts.isInitialized) return;
+      final st = await ts.status();
+      if ((st.state == NodeState.needsLogin ||
+          st.state == NodeState.needsMachineAuth ||
+          st.state == NodeState.stopped) &&
+          st.authUrl != null && mounted) {
+        _showAuthUrl();
       }
     } catch (_) {}
   }
@@ -187,6 +204,93 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with SingleTickerProvid
           ),
         ],
       ),
+    );
+  }
+
+  Future<void> _showTailscaleSettings() async {
+    if (!mounted) return;
+    final ts = ref.read(tailscaleServiceProvider);
+    TailscaleStatus? st;
+    try { st = await ts.status(); } catch (_) {}
+    final hasAuthKey = await ts.readAuthKey();
+    if (!mounted) return;
+    final nodeState = _tailscaleNodeState;
+    Color stateColor;
+    String stateLabel;
+    if (nodeState == null || nodeState == NodeState.noState) {
+      stateColor = Colors.grey;
+      stateLabel = 'Not initialized';
+    } else if (nodeState == NodeState.running) {
+      stateColor = const Color(0xFF4CAF50);
+      stateLabel = 'Connected';
+    } else if (nodeState == NodeState.needsLogin ||
+        nodeState == NodeState.needsMachineAuth) {
+      stateColor = const Color(0xFFFF9800);
+      stateLabel = nodeState == NodeState.needsLogin
+          ? 'Login required'
+          : 'Machine auth required';
+    } else if (nodeState == NodeState.starting) {
+      stateColor = const Color(0xFFFFD54F);
+      stateLabel = 'Connecting';
+    } else {
+      stateColor = Colors.grey;
+      stateLabel = 'Stopped';
+    }
+    showDialog(context: context, builder: (ctx) {
+      return AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius:BorderRadius.circular(16),side:BorderSide(color:Colors.white.withOpacity(0.08))),
+        backgroundColor: AppConstants.surfaceDark,
+        title: Row(children: [
+          Container(width:10,height:10,decoration:BoxDecoration(shape:BoxShape.circle,color:stateColor,boxShadow:[BoxShadow(color:stateColor.withOpacity(0.4),blurRadius:6)])),
+          SizedBox(width:10),
+          Text('Tailscale Node'),
+        ]),
+        content: Column(mainAxisSize:MainAxisSize.min,crossAxisAlignment:CrossAxisAlignment.start,children:[
+          _tsInfoRow('Status',stateLabel,stateColor),
+          if(st!=null) ...[
+            SizedBox(height:6),
+            _tsInfoRow('IPv4',st.ipv4??'-',Colors.white70),
+            SizedBox(height:6),
+            _tsInfoRow('DNS',st.magicDNSSuffix??'-',Colors.white70),
+            SizedBox(height:6),
+            _tsInfoRow('Node ID',st.stableNodeId??"-",Colors.white70),
+          ],
+          SizedBox(height:12),
+          _tsInfoRow('Auth Key',hasAuthKey!=null?'Configured':'Not set',hasAuthKey!=null?AppConstants.primaryGreen:Colors.white38),
+        ]),
+        actions: [
+          TextButton(onPressed: () async {
+            Navigator.pop(ctx);
+            try { await ts.logout(); if(mounted) setState((){}); } catch(_) {}
+          }, child: Text('Logout')),
+          TextButton(onPressed: () async {
+            Navigator.pop(ctx);
+            try { await ts.up(); } catch(_) {}
+          }, child: Text('Reconnect')),
+          ElevatedButton(onPressed: ()=>Navigator.pop(ctx), child: Text('Close')),
+        ],
+      );
+    });
+  }
+
+  Widget _tsInfoRow(String label, String value, Color valueColor) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label,
+          style: TextStyle(
+            color: Colors.white54,
+            fontSize: 13,
+          ),
+        ),
+        Text(value,
+          style: TextStyle(
+            color: valueColor,
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
     );
   }
 
@@ -585,7 +689,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with SingleTickerProvid
 
   @override
   void dispose() {
-    _tsSub?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
     _menuAnimCtrl.dispose();
     super.dispose();
   }
@@ -603,6 +707,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with SingleTickerProvid
 
   List<Widget> _buildMenuActions() {
     return [
+      _MenuItem(
+        animCtrl: _menuAnimCtrl,
+        index: 3,
+        icon: Icons.settings_ethernet_rounded,
+        color: const Color(0xFF7C4DFF),
+        label: 'Tailscale',
+        onTap: () {
+          _toggleMenu();
+          _showTailscaleSettings();
+        },
+      ),
       _MenuItem(
         animCtrl: _menuAnimCtrl,
         index: 2,
