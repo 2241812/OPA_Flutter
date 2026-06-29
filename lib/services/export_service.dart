@@ -118,6 +118,7 @@ class ExportService {
       'createdAt': p.createdAt.toIso8601String(),
       'updatedAt': p.updatedAt.toIso8601String(),
       'lastConnectionSuccess': p.lastConnectionSuccess,
+      'connectionMethod': p.connectionMethod.name,
     };
   }
 
@@ -135,6 +136,7 @@ class ExportService {
       createdAt: _parseDateTime(map['createdAt']),
       updatedAt: _parseDateTime(map['updatedAt']),
       lastConnectionSuccess: map['lastConnectionSuccess'] as bool? ?? false,
+      connectionMethod: _parseConnectionMethod(map['connectionMethod'] as String?),
     );
   }
 
@@ -166,6 +168,14 @@ class ExportService {
     return AuthType.values.firstWhere(
       (a) => a.name == name,
       orElse: () => AuthType.password,
+    );
+  }
+
+  static ConnectionMethod _parseConnectionMethod(String? name) {
+    if (name == null) return ConnectionMethod.direct;
+    return ConnectionMethod.values.firstWhere(
+      (m) => m.name == name,
+      orElse: () => ConnectionMethod.direct,
     );
   }
 

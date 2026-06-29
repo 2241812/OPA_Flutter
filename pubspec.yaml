@@ -3,7 +3,7 @@ description: OPA - OpenSSH Pocket Agent. A Flutter app that makes SSH connectivi
 version: 0.2.4+1
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
+  sdk: ">=3.10.4 <4.0.0"
 
 dependencies:
   flutter:
@@ -54,6 +54,14 @@ dependencies:
 
   # Biometric authentication (fingerprint / face)
   local_auth: ^2.3.0
+
+
+  # Tailscale embedded networking -- WireGuard tailnet without separate app
+  tailscale: ^0.5.0
+
+  # File system paths (used for Tailscale state directory)
+  path_provider: ^2.1.0
+  path: ^1.9.0
 
 dev_dependencies:
   flutter_test:

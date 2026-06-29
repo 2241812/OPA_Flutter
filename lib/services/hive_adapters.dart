@@ -40,6 +40,7 @@ class ConnectionProfileAdapter extends TypeAdapter<ConnectionProfile> {
       createdAt: DateTime.fromMillisecondsSinceEpoch(reader.readInt()),
       updatedAt: DateTime.fromMillisecondsSinceEpoch(reader.readInt()),
       lastConnectionSuccess: reader.readBool(),
+      connectionMethod: _readConnectionMethod(reader),
     );
   }
 
@@ -57,6 +58,21 @@ class ConnectionProfileAdapter extends TypeAdapter<ConnectionProfile> {
     writer.writeInt(obj.createdAt.millisecondsSinceEpoch);
     writer.writeInt(obj.updatedAt.millisecondsSinceEpoch);
     writer.writeBool(obj.lastConnectionSuccess);
+    writer.writeByte(obj.connectionMethod.index);
+  }
+
+  /// Reads [ConnectionMethod] from a Hive binary reader with backward
+  /// compatibility for profiles saved before this field existed.
+  ConnectionMethod _readConnectionMethod(BinaryReader reader) {
+    try {
+      if (reader.availableBytes > 0) {
+        final index = reader.readByte();
+        if (index >= 0 && index < ConnectionMethod.values.length) {
+          return ConnectionMethod.values[index];
+        }
+      }
+    } catch (_) {}
+    return ConnectionMethod.direct;
   }
 }
 

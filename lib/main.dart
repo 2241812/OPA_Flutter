@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tailscale/tailscale.dart';
 
 import 'app_theme.dart';
 import 'app_router.dart';
@@ -29,6 +31,14 @@ void main() async {
   await Hive.openBox<ConnectionProfile>('connection_profiles');
   await Hive.openBox<StoredKeyPair>('ssh_keys');
   await Hive.openBox<QuickCommand>('quick_commands');
+
+  // Init embedded Tailscale node
+  try {
+    final d = await getApplicationSupportDirectory();
+    Tailscale.init(stateDir: d.path, logLevel: TailscaleLogLevel.silent);
+  } catch (e) {
+    debugPrint("[TS] " + e.toString());
+  }
 
   runApp(
     ProviderScope(

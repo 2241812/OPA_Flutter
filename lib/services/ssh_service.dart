@@ -62,24 +62,29 @@ class SshService extends ChangeNotifier {
   ///
   /// [privateKey] is the OpenSSH-formatted private key PEM string, used for
   /// key-based auth. [keepalive] overrides the default keepalive interval.
+  /// If [socket] is provided it is used instead of creating a direct TCP
+  /// connection — this enables routing through a Tailscale tunnel.
   /// Returns the established dartssh2.SSHClient.
   Future<dartssh2.SSHClient> connect({
     required ConnectionProfile profile,
     String? privateKey,
     String? password,
     Duration? keepalive,
+    dartssh2.SSHSocket? socket,
   }) async {
     _state = SshConnectionState.connecting;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      // dartssh2 uses its own SSHSocket (not dart:io's Socket).
-      final socket = await dartssh2.SSHSocket.connect(
-        profile.host,
-        profile.port,
-        timeout: AppConstants.connectionTimeout,
-      );
+      // Use the provided socket (e.g. from Tailscale) or create a direct
+      // TCP connection through dartssh2's native socket.
+      final sock = socket ??
+          await dartssh2.SSHSocket.connect(
+            profile.host,
+            profile.port,
+            timeout: AppConstants.connectionTimeout,
+          );
 
       // Build identities for key-based auth. A PEM file may contain
       // multiple keys, so fromPem returns a List<SSHKeyPair>.
@@ -94,7 +99,7 @@ class SshService extends ChangeNotifier {
       //  - key auth via `identities`
       //  - password auth via `onPasswordRequest`
       _client = dartssh2.SSHClient(
-        socket,
+        sock,
         username: profile.username,
         keepAliveInterval: keepalive ?? AppConstants.defaultKeepAlive,
         identities: identities ?? const [],
@@ -201,11 +206,13 @@ class SshService extends ChangeNotifier {
     required ConnectionProfile profile,
     String? privateKey,
     String? password,
+    dartssh2.SSHSocket? socket,
   }) async {
     await connect(
       profile: profile,
       privateKey: privateKey,
       password: password,
+      socket: socket,
     );
     await disconnect();
     return true;

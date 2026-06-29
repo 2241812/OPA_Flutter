@@ -11,6 +11,14 @@ enum AuthType {
   passwordAndPublicKey,
 }
 
+/// How the connection reaches the remote host.
+enum ConnectionMethod {
+  /// Direct TCP connection (DNS hostname or public IP).
+  direct,
+  /// Via an embedded Tailscale node over WireGuard.
+  tailscale,
+}
+
 /// A saved SSH connection profile.
 ///
 /// Serialized by [ConnectionProfileAdapter] (manual Hive TypeAdapter).
@@ -29,6 +37,7 @@ class ConnectionProfile extends HiveObject {
   DateTime createdAt;
   DateTime updatedAt;
   bool lastConnectionSuccess; // Green/red indicator on home screen
+  ConnectionMethod connectionMethod; // How to reach this host
 
   ConnectionProfile({
     required this.id,
@@ -43,6 +52,7 @@ class ConnectionProfile extends HiveObject {
     DateTime? createdAt,
     DateTime? updatedAt,
     this.lastConnectionSuccess = false,
+    this.connectionMethod = ConnectionMethod.direct,
   })  : createdAt = createdAt ?? DateTime.now(),
         updatedAt = updatedAt ?? DateTime.now();
 
@@ -56,6 +66,7 @@ class ConnectionProfile extends HiveObject {
     String? keyId,
     int? colorIndex,
     bool? lastConnectionSuccess,
+    ConnectionMethod? connectionMethod,
   }) {
     return ConnectionProfile(
       id: id,
@@ -71,6 +82,7 @@ class ConnectionProfile extends HiveObject {
       updatedAt: DateTime.now(),
       lastConnectionSuccess:
           lastConnectionSuccess ?? this.lastConnectionSuccess,
+      connectionMethod: connectionMethod ?? this.connectionMethod,
     );
   }
 

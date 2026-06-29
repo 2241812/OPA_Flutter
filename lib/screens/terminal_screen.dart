@@ -10,7 +10,10 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:xterm/xterm.dart';
 
+import '../models/connection_profile.dart';
 import '../services/key_service.dart';
+import '../services/tailscale_provider.dart';
+import '../services/tailscale_ssh_socket.dart';
 import '../services/profile_storage_service.dart';
 import '../services/ssh_service.dart';
 import '../utils/constants.dart';
@@ -166,6 +169,13 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen>
 
       final sshService = ref.read(sshServiceProvider);
 
+      var sock;
+      if (profile.connectionMethod == ConnectionMethod.tailscale) {
+        var ts = ref.read(tailscaleServiceProvider);
+        var conn = await ts.dial(profile.host, profile.port, timeout: Duration(seconds: 10));
+        sock = TailscaleSSHSocket(conn);
+      }
+
       String? privateKey;
       if (profile.keyId != null) {
         privateKey =
@@ -177,6 +187,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen>
         privateKey: privateKey,
         password: profile.password,
         keepalive: Duration(seconds: ref.read(terminalKeepaliveProvider)),
+        socket: sock,
       );
 
       _terminal.write(

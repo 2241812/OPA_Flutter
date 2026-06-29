@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,6 +10,8 @@ import '../models/connection_profile.dart';
 import '../services/key_service.dart';
 import '../services/profile_storage_service.dart';
 import '../services/ssh_service.dart';
+import '../services/tailscale_provider.dart';
+import '../services/tailscale_ssh_socket.dart';
 import '../utils/constants.dart';
 import '../widgets/connection_card.dart';
 
@@ -37,6 +40,9 @@ class _ProfileEditorScreenState extends ConsumerState<ProfileEditorScreen> {
   int _colorIndex = 0;
   bool _isTesting = false;
   bool _obscurePassword = true;
+  final _authKeyController = TextEditingController();
+  bool _obscureAuthKey = true;
+  ConnectionMethod _connectionMethod = ConnectionMethod.direct;
 
   bool get _isEditing => widget.profileId != null;
   ConnectionProfile? _existingProfile;
@@ -44,11 +50,10 @@ class _ProfileEditorScreenState extends ConsumerState<ProfileEditorScreen> {
   @override
   void initState() {
     super.initState();
-    if (_isEditing) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _loadExistingProfile();
-      });
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_isEditing) _loadExistingProfile();
+      _loadAuthKey();
+    });
   }
 
   void _loadExistingProfile() {
@@ -67,10 +72,19 @@ class _ProfileEditorScreenState extends ConsumerState<ProfileEditorScreen> {
       _authType = _existingProfile!.authType;
       _selectedKeyId = _existingProfile!.keyId;
       _colorIndex = _existingProfile!.colorIndex;
+      _connectionMethod = _existingProfile!.connectionMethod;
       if (_existingProfile!.password != null) {
         _passwordController.text = _existingProfile!.password!;
       }
     });
+  }
+
+  Future<void> _loadAuthKey() async {
+    final ts = ref.read(tailscaleServiceProvider);
+    final key = await ts.readAuthKey();
+    if (key != null && key.isNotEmpty && mounted) {
+      setState(() => _authKeyController.text = key);
+    }
   }
 
   @override
@@ -80,6 +94,7 @@ class _ProfileEditorScreenState extends ConsumerState<ProfileEditorScreen> {
     _portController.dispose();
     _usernameController.dispose();
     _passwordController.dispose();
+    _authKeyController.dispose();
     super.dispose();
   }
 
@@ -290,6 +305,55 @@ class _ProfileEditorScreenState extends ConsumerState<ProfileEditorScreen> {
                 ),
             ],
 
+            const SizedBox(height: 28),
+            _buildSectionLabel('Network'),
+            const SizedBox(height: 12),
+
+            SegmentedButton<ConnectionMethod>(
+              style: const ButtonStyle(
+                iconSize: WidgetStatePropertyAll(14),
+                textStyle: WidgetStatePropertyAll(TextStyle(fontSize: 12)),
+                padding: WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 8, vertical: 8)),
+              ),
+              segments: const [
+                ButtonSegment(
+                  value: ConnectionMethod.direct,
+                  label: Text('Direct'),
+                  icon: Icon(Icons.language_rounded, size: 14),
+                ),
+                ButtonSegment(
+                  value: ConnectionMethod.tailscale,
+                  label: Text('Tailscale'),
+                  icon: Icon(Icons.vpn_lock_rounded, size: 14),
+                ),
+              ],
+              selected: {_connectionMethod},
+              onSelectionChanged: (sel) {
+                setState(() => _connectionMethod = sel.first);
+              },
+            ),
+            // Tailscale auth key
+            if (_connectionMethod == ConnectionMethod.tailscale) ...[
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _authKeyController,
+                obscureText: _obscureAuthKey,
+                decoration: InputDecoration(
+                  labelText: 'Tailscale Auth Key',
+                  hintText: 'tskey-auth-xxxxx',
+                  prefixIcon: const Icon(Icons.vpn_key_rounded),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscureAuthKey
+                          ? Icons.visibility_off_rounded
+                          : Icons.visibility_rounded,
+                    ),
+                    onPressed: () =>
+                        setState(() => _obscureAuthKey = !_obscureAuthKey),
+                  ),
+                ),
+              ),
+            ],
             const SizedBox(height: 36),
 
             // Test connection button
@@ -410,6 +474,13 @@ class _ProfileEditorScreenState extends ConsumerState<ProfileEditorScreen> {
       final profile = _buildProfile();
       final sshService = ref.read(sshServiceProvider);
 
+      var sock;
+      if (_connectionMethod == ConnectionMethod.tailscale) {
+        var ts = ref.read(tailscaleServiceProvider);
+        var conn = await ts.dial(profile.host, profile.port, timeout: Duration(seconds: 10));
+        sock = TailscaleSSHSocket(conn);
+      }
+
       String? privateKey;
       if (_authType != AuthType.password && _selectedKeyId != null) {
         privateKey = await ref
@@ -421,6 +492,7 @@ class _ProfileEditorScreenState extends ConsumerState<ProfileEditorScreen> {
         profile: profile,
         privateKey: privateKey,
         password: _passwordController.text,
+        socket: sock,
       );
 
       if (mounted) {
@@ -468,6 +540,13 @@ class _ProfileEditorScreenState extends ConsumerState<ProfileEditorScreen> {
     final storage = ref.read(profileStorageProvider);
     await storage.saveProfile(profile);
 
+    if (profile.connectionMethod == ConnectionMethod.tailscale &&
+        _authKeyController.text.trim().isNotEmpty) {
+      final ts = ref.read(tailscaleServiceProvider);
+      await ts.storeAuthKey(_authKeyController.text.trim());
+      unawaited(ts.up(authKey: _authKeyController.text.trim()));
+    }
+
     if (mounted) {
       context.pop();
       ScaffoldMessenger.of(context).showSnackBar(
@@ -494,6 +573,7 @@ class _ProfileEditorScreenState extends ConsumerState<ProfileEditorScreen> {
           : null,
       keyId: _selectedKeyId,
       colorIndex: _colorIndex,
+      connectionMethod: _connectionMethod,
       createdAt: _existingProfile?.createdAt,
     );
   }

@@ -12,6 +12,8 @@ import '../models/quick_command.dart';
 import '../services/key_service.dart';
 import '../services/profile_storage_service.dart';
 import '../services/ssh_service.dart';
+import '../services/tailscale_provider.dart';
+import '../services/tailscale_ssh_socket.dart';
 import '../utils/agent_presets.dart';
 import '../utils/constants.dart';
 import '../widgets/connection_card.dart';
@@ -759,6 +761,8 @@ class _QuickCommandsScreenState extends ConsumerState<QuickCommandsScreen> {
     ConnectionProfile profile,
   ) async {
     final sshService = ref.read(sshServiceProvider);
+
+    var sock;
     String? privateKey;
     if (profile.keyId != null) {
       privateKey =
@@ -766,10 +770,16 @@ class _QuickCommandsScreenState extends ConsumerState<QuickCommandsScreen> {
     }
 
     try {
+      if (profile.connectionMethod == ConnectionMethod.tailscale) {
+        var ts = ref.read(tailscaleServiceProvider);
+        var conn = await ts.dial(profile.host, profile.port, timeout: Duration(seconds: 10));
+        sock = TailscaleSSHSocket(conn);
+      }
       await sshService.connect(
         profile: profile,
         privateKey: privateKey,
         password: profile.password,
+        socket: sock,
       );
       final output = await sshService.executeCommand(cmd.command);
       await sshService.disconnect();

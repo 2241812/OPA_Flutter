@@ -21,6 +21,10 @@ class AppConstants {
   // Biometric lock
   static const String biometricLockEnabledKey = 'opa_biometric_lock_enabled';
 
+  // Tailscale
+  static const String tailscaleAuthKeyKey = 'opa_tailscale_auth_key';
+  static const String tailscaleStateDirName = 'tailscale-state';
+
   // GitHub repository — used for update checks via Releases API
   static const String gitHubOwner = '2241812';
   static const String gitHubRepo = 'OPA_Flutter';
