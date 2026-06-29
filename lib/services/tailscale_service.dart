@@ -5,6 +5,34 @@ import 'package:tailscale/tailscale.dart';
 
 import '../utils/constants.dart';
 
+/// Base exception for all Tailscale service errors in OPA.
+class TailscaleException implements Exception {
+  final String message;
+  final String code;
+  final Object? cause;
+  const TailscaleException(this.message, this.code, {this.cause});
+  @override
+  String toString() => "TailscaleException[]: ";
+}
+
+/// Thrown when the Tailscale TCP dial fails (node not reachable).
+class TailscaleDialException extends TailscaleException {
+  const TailscaleDialException(String message, {Object? cause})
+      : super(message, "DIAL", cause: cause);
+}
+
+/// Thrown when the node cannot connect to the tailnet.
+class TailscaleConnectException extends TailscaleException {
+  const TailscaleConnectException(String message, {Object? cause})
+      : super(message, "CONNECT", cause: cause);
+}
+
+/// Thrown when the auth key is missing or invalid.
+class TailscaleAuthException extends TailscaleException {
+  const TailscaleAuthException(String message, {Object? cause})
+      : super(message, "AUTH", cause: cause);
+}
+
 /// Service wrapping an embedded Tailscale node via `package:tailscale`.
 ///
 /// The app joins the user's tailnet as its own node — no separate Tailscale
@@ -147,8 +175,13 @@ class TailscaleService {
         await up(timeout: timeout ?? const Duration(seconds: 30));
       } else {
         final key = await readAuthKey();
+        if (key == null || key.isEmpty) {
+          throw const TailscaleAuthException(
+            "No auth key configured. Add one in Profile > Tailscale.",
+          );
+        }
         await up(
-          authKey: (key != null && key.isNotEmpty) ? key : null,
+          authKey: key,
           timeout: timeout ?? const Duration(seconds: 30),
         );
       }
@@ -161,7 +194,17 @@ class TailscaleService {
   Future<TailscaleConnection> dial(String address, int port,
       {Duration? timeout}) async {
     await _ensureUp(timeout: timeout);
-    return Tailscale.instance.tcp.dial(address, port, timeout: timeout);
+    try {
+      return await Tailscale.instance.tcp.dial(
+        address, port, timeout: timeout,
+      );
+    } catch (e) {
+      throw TailscaleDialException(
+        "Could not reach $address:$port over tailnet. "
+        "Verify the remote host is online and connected to the tailnet.",
+        cause: e is Exception ? e : null,
+      );
+    }
   }
 
   // --- Node discovery ---

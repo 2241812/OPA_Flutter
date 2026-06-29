@@ -105,10 +105,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       if (!ts.isInitialized) return;
       final st = await ts.status();
       if ((st.state == NodeState.needsLogin ||
-          st.state == NodeState.needsMachineAuth ||
-          st.state == NodeState.stopped) &&
+          st.state == NodeState.needsMachineAuth) &&
           st.authUrl != null && mounted) {
         _showAuthUrl();
+      } else if (st.state == NodeState.stopped ||
+          st.state == NodeState.noState) {
+        final key = await ts.readAuthKey();
+        if (key != null && key.isNotEmpty) {
+          await ts.up(authKey: key);
+        }
       }
     } catch (_) {}
   }
