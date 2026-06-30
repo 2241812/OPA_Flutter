@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -401,7 +400,7 @@ class _ProfileEditorScreenState extends ConsumerState<ProfileEditorScreen> {
           style: GoogleFonts.inter(
             fontSize: 13,
             fontWeight: FontWeight.w700,
-            color: Colors.white.withOpacity(0.7),
+            color: Colors.white.withValues(alpha: 0.7),
             letterSpacing: 0.5,
           ),
         ),
@@ -418,7 +417,7 @@ class _ProfileEditorScreenState extends ConsumerState<ProfileEditorScreen> {
           style: GoogleFonts.inter(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: Colors.white.withOpacity(0.5),
+            color: Colors.white.withValues(alpha: 0.5),
           ),
         ),
         const SizedBox(height: 10),
@@ -447,7 +446,7 @@ class _ProfileEditorScreenState extends ConsumerState<ProfileEditorScreen> {
                     boxShadow: isSelected
                         ? [
                             BoxShadow(
-                              color: color.withOpacity(0.4),
+                              color: color.withValues(alpha: 0.4),
                               blurRadius: 10,
                               spreadRadius: 1,
                             ),

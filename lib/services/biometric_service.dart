@@ -35,11 +35,8 @@ class BiometricService {
     try {
       return await _auth.authenticate(
         localizedReason: reason,
-        options: AuthenticationOptions(
-          stickyAuth: true,
-          useErrorDialogs: true,
-          biometricOnly: biometricOnly,
-        ),
+        biometricOnly: biometricOnly,
+        persistAcrossBackgrounding: true,
       );
     } on PlatformException {
       rethrow;

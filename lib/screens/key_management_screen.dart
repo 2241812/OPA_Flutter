@@ -59,11 +59,11 @@ class _KeyManagementScreenState extends ConsumerState<KeyManagementScreen> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 7, vertical: 2),
                     decoration: BoxDecoration(
-                      color: AppConstants.primaryGreen.withOpacity(0.12),
+                      color: AppConstants.primaryGreen.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
                         color:
-                            AppConstants.primaryGreen.withOpacity(0.2),
+                            AppConstants.primaryGreen.withValues(alpha: 0.2),
                       ),
                     ),
                     child: Text(
@@ -93,7 +93,7 @@ class _KeyManagementScreenState extends ConsumerState<KeyManagementScreen> {
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: AppConstants.primaryGreen.withOpacity(0.25),
+              color: AppConstants.primaryGreen.withValues(alpha: 0.25),
               blurRadius: 16,
               spreadRadius: 2,
             ),
@@ -116,10 +116,10 @@ class _KeyManagementScreenState extends ConsumerState<KeyManagementScreen> {
       child: Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: AppConstants.primaryGreen.withOpacity(0.06),
+              color: AppConstants.primaryGreen.withValues(alpha: 0.06),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: AppConstants.primaryGreen.withOpacity(0.15),
+                color: AppConstants.primaryGreen.withValues(alpha: 0.15),
               ),
             ),
             child: Row(
@@ -128,7 +128,7 @@ class _KeyManagementScreenState extends ConsumerState<KeyManagementScreen> {
                   width: 32,
                   height: 32,
                   decoration: BoxDecoration(
-                    color: AppConstants.primaryGreen.withOpacity(0.1),
+                    color: AppConstants.primaryGreen.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Icon(
@@ -144,7 +144,7 @@ class _KeyManagementScreenState extends ConsumerState<KeyManagementScreen> {
                     'Copy the public key to your server\'s authorized_keys.',
                     style: GoogleFonts.inter(
                       fontSize: 12,
-                      color: Colors.white.withOpacity(0.55),
+                      color: Colors.white.withValues(alpha: 0.55),
                       height: 1.5,
                     ),
                   ),
@@ -168,12 +168,12 @@ class _KeyManagementScreenState extends ConsumerState<KeyManagementScreen> {
           Icon(
             Icons.vpn_key_rounded,
             size: 64,
-            color: Colors.white.withOpacity(0.1),
+            color: Colors.white.withValues(alpha: 0.1),
           )
               .animate(onPlay: (c) => c.repeat())
               .shimmer(
                   duration: 2500.ms,
-                  color: AppConstants.primaryGreen.withOpacity(0.08))
+                  color: AppConstants.primaryGreen.withValues(alpha: 0.08))
               .scale(
                 begin: const Offset(1, 1),
                 end: const Offset(1.02, 1.02),
@@ -186,7 +186,7 @@ class _KeyManagementScreenState extends ConsumerState<KeyManagementScreen> {
             style: GoogleFonts.inter(
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: Colors.white.withOpacity(0.45),
+              color: Colors.white.withValues(alpha: 0.45),
             ),
           ),
           const SizedBox(height: 8),
@@ -194,7 +194,7 @@ class _KeyManagementScreenState extends ConsumerState<KeyManagementScreen> {
             'Generate or import a key to get started',
             style: GoogleFonts.inter(
               fontSize: 14,
-              color: Colors.white.withOpacity(0.25),
+              color: Colors.white.withValues(alpha: 0.25),
             ),
             textAlign: TextAlign.center,
           ),
@@ -386,12 +386,12 @@ class _KeyManagementScreenState extends ConsumerState<KeyManagementScreen> {
           filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
           child: Container(
             decoration: BoxDecoration(
-              color: AppConstants.surfaceDark.withOpacity(0.9),
+              color: AppConstants.surfaceDark.withValues(alpha: 0.9),
               borderRadius:
                   const BorderRadius.vertical(top: Radius.circular(20)),
               border: Border(
                 top: BorderSide(
-                  color: AppConstants.primaryGreen.withOpacity(0.15),
+                  color: AppConstants.primaryGreen.withValues(alpha: 0.15),
                 ),
               ),
             ),
@@ -406,7 +406,7 @@ class _KeyManagementScreenState extends ConsumerState<KeyManagementScreen> {
                       height: 4,
                       margin: const EdgeInsets.only(bottom: 12),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.15),
+                        color: Colors.white.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -416,7 +416,7 @@ class _KeyManagementScreenState extends ConsumerState<KeyManagementScreen> {
                         height: 36,
                         decoration: BoxDecoration(
                           color:
-                              AppConstants.primaryGreen.withOpacity(0.1),
+                              AppConstants.primaryGreen.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: const Icon(
@@ -433,7 +433,7 @@ class _KeyManagementScreenState extends ConsumerState<KeyManagementScreen> {
                         'Recommended',
                         style: GoogleFonts.inter(
                             fontSize: 11,
-                            color: AppConstants.primaryGreen.withOpacity(0.7)),
+                            color: AppConstants.primaryGreen.withValues(alpha: 0.7)),
                       ),
                       onTap: () {
                         Navigator.pop(context);
@@ -445,7 +445,7 @@ class _KeyManagementScreenState extends ConsumerState<KeyManagementScreen> {
                         width: 36,
                         height: 36,
                         decoration: BoxDecoration(
-                          color: const Color(0xFF448AFF).withOpacity(0.1),
+                          color: const Color(0xFF448AFF).withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: const Icon(

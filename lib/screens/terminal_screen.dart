@@ -514,7 +514,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen>
             '${_fontSize.toInt()}',
             style: GoogleFonts.jetBrainsMono(
               fontSize: 12,
-              color: Colors.white.withOpacity(0.4),
+              color: Colors.white.withValues(alpha: 0.4),
             ),
           ),
         ),
@@ -531,7 +531,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen>
             size: 18,
             color: _userZoomed
                 ? AppConstants.primaryGreen
-                : Colors.white.withOpacity(0.4),
+                : Colors.white.withValues(alpha: 0.4),
           ),
           tooltip: 'Auto-fit',
           onPressed: _resetAutoFit,
@@ -637,7 +637,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen>
       statusColor = Colors.red;
       statusText = '✗ Disconnected';
     } else {
-      statusColor = Colors.white.withOpacity(0.3);
+      statusColor = Colors.white.withValues(alpha: 0.3);
       statusText = '○ Disconnected';
     }
 
@@ -649,7 +649,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen>
               ? AppConstants.statusBarHeightLandscape
               : AppConstants.statusBarHeightPortrait,
           padding: const EdgeInsets.symmetric(horizontal: 12),
-          color: AppConstants.surfaceDark.withOpacity(0.7),
+          color: AppConstants.surfaceDark.withValues(alpha: 0.7),
           child: Row(
             children: [
               Container(
@@ -660,7 +660,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen>
                   color: statusColor,
                   boxShadow: [
                     BoxShadow(
-                      color: statusColor.withOpacity(0.5),
+                      color: statusColor.withValues(alpha: 0.5),
                       blurRadius: 4,
                     ),
                   ],
@@ -680,7 +680,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen>
                 '${_terminal.viewWidth}×${_terminal.viewHeight}',
                 style: GoogleFonts.jetBrainsMono(
                   fontSize: 11,
-                  color: Colors.white.withOpacity(0.3),
+                  color: Colors.white.withValues(alpha: 0.3),
                 ),
               ),
             ],
@@ -726,7 +726,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen>
         filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
         child: Container(
           height: barHeight,
-          color: AppConstants.surfaceDark.withOpacity(0.8),
+          color: AppConstants.surfaceDark.withValues(alpha: 0.8),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: keys
@@ -774,7 +774,7 @@ class _SpecialKeyButton extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           decoration: BoxDecoration(
             border: Border.all(
-              color: (color ?? Colors.white).withOpacity(0.15),
+              color: (color ?? Colors.white).withValues(alpha: 0.15),
             ),
             borderRadius: BorderRadius.circular(6),
           ),
@@ -783,7 +783,7 @@ class _SpecialKeyButton extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: 13,
               fontWeight: FontWeight.bold,
-              color: color ?? Colors.white.withOpacity(0.7),
+              color: color ?? Colors.white.withValues(alpha: 0.7),
             ),
           ),
         ),

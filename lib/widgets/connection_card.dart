@@ -46,14 +46,14 @@ class ConnectionCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       child: Container(
             decoration: BoxDecoration(
-              color: AppConstants.surfaceDark.withOpacity(0.7),
+              color: AppConstants.surfaceDark.withValues(alpha: 0.7),
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                color: Colors.white.withOpacity(0.06),
+                color: Colors.white.withValues(alpha: 0.06),
               ),
               boxShadow: [
                 BoxShadow(
-                  color: accent.withOpacity(0.04),
+                  color: accent.withValues(alpha: 0.04),
                   blurRadius: 20,
                   spreadRadius: 2,
                   offset: const Offset(0, 4),
@@ -79,7 +79,7 @@ class ConnectionCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(2),
                           boxShadow: [
                             BoxShadow(
-                              color: accent.withOpacity(0.4),
+                              color: accent.withValues(alpha: 0.4),
                               blurRadius: 8,
                               spreadRadius: 1,
                             ),
@@ -105,7 +105,7 @@ class ConnectionCard extends StatelessWidget {
                                         ? [
                                             BoxShadow(
                                               color: AppConstants.primaryGreen
-                                                  .withOpacity(0.4),
+                                                  .withValues(alpha: 0.4),
                                               blurRadius: 6,
                                             ),
                                           ]
@@ -131,7 +131,7 @@ class ConnectionCard extends StatelessWidget {
                               '${profile.username}@${profile.host}:${profile.port}',
                               style: GoogleFonts.jetBrainsMono(
                                 fontSize: 12,
-                                color: Colors.white.withOpacity(0.5),
+                                color: Colors.white.withValues(alpha: 0.5),
                               ),
                             ),
                             const SizedBox(height: 2),
@@ -141,7 +141,7 @@ class ConnectionCard extends StatelessWidget {
                                   _authTypeLabel(profile.authType),
                                   style: GoogleFonts.inter(
                                     fontSize: 11,
-                                    color: accent.withOpacity(0.8),
+                                    color: accent.withValues(alpha: 0.8),
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
@@ -151,8 +151,8 @@ class ConnectionCard extends StatelessWidget {
                                   padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
                                   decoration: BoxDecoration(
                                     color: profile.connectionMethod == ConnectionMethod.tailscale
-                                        ? Colors.blue.withOpacity(0.15)
-                                        : Colors.white.withOpacity(0.06),
+                                        ? Colors.blue.withValues(alpha: 0.15)
+                                        : Colors.white.withValues(alpha: 0.06),
                                     borderRadius: BorderRadius.circular(3),
                                   ),
                                   child: Text(
@@ -161,8 +161,8 @@ class ConnectionCard extends StatelessWidget {
                                       fontSize: 8,
                                       fontWeight: FontWeight.w600,
                                       color: profile.connectionMethod == ConnectionMethod.tailscale
-                                          ? Colors.blue.withOpacity(0.8)
-                                          : Colors.white.withOpacity(0.4),
+                                          ? Colors.blue.withValues(alpha: 0.8)
+                                          : Colors.white.withValues(alpha: 0.4),
                                     ),
                                   ),
                                 ),
@@ -174,7 +174,7 @@ class ConnectionCard extends StatelessWidget {
                       // Tap to connect arrow
                       Icon(
                         Icons.chevron_right,
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                       ),
                     ],
                   ),
@@ -190,11 +190,11 @@ class ConnectionCard extends StatelessWidget {
       if (tailscaleState == NodeState.running) return AppConstants.primaryGreen;
       if (tailscaleState == NodeState.needsLogin || tailscaleState == NodeState.noState) return Colors.orange;
       if (tailscaleState == NodeState.starting) return Colors.amber;
-      return Colors.white.withOpacity(0.3);
+      return Colors.white.withValues(alpha: 0.3);
     }
     return profile.lastConnectionSuccess
         ? AppConstants.primaryGreen
-        : Colors.white.withOpacity(0.3);
+        : Colors.white.withValues(alpha: 0.3);
   }
 
   String _authTypeLabel(AuthType type) {

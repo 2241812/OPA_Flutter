@@ -1,0 +1,13 @@
+include: package:lints/recommended.yaml
+
+analyzer:
+  exclude:
+    - packages/**
+
+linter:
+  rules:
+    - avoid_empty_else
+    - avoid_slow_async_io
+    - cancel_subscriptions
+    - close_sinks
+    - unawaited_futures

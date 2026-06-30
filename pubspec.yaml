@@ -1,4 +1,4 @@
-﻿name: opa
+name: opa
 description: OPA - OpenSSH Pocket Agent. A Flutter app that makes SSH connectivity effortless.
 version: 0.2.4+1
 
@@ -19,7 +19,7 @@ dependencies:
   pinenacl: ^0.6.0
 
   # Secure on-device storage (Android Keystore / iOS Keychain)
-  flutter_secure_storage: ^9.2.0
+  flutter_secure_storage: ^10.3.0
 
   # Local NoSQL database for profiles & commands
   hive: ^2.2.3
@@ -29,7 +29,7 @@ dependencies:
   flutter_riverpod: ^2.5.1
 
   # Routing
-  go_router: ^14.6.0
+  go_router: ^17.3.0
 
   # UUID generation for unique IDs
   uuid: ^4.5.1
@@ -38,7 +38,7 @@ dependencies:
   shared_preferences: ^2.3.0
 
   # Typography - JetBrains Mono (terminal) + Inter (UI)
-  google_fonts: ^6.2.0
+  google_fonts: ^8.1.0
 
   # Declarative spring/fade animations
   flutter_animate: ^4.5.0
@@ -50,14 +50,15 @@ dependencies:
   url_launcher: ^6.3.0
 
   # Read the installed app version at runtime (for update checks)
-  package_info_plus: ^8.0.0
+  package_info_plus: ^10.0.0
 
   # Biometric authentication (fingerprint / face)
-  local_auth: ^2.3.0
+  local_auth: ^3.0.1
 
 
   # Tailscale embedded networking -- WireGuard tailnet without separate app
-  tailscale: ^0.5.0
+  tailscale:
+    path: packages/tailscale
 
   # File system paths (used for Tailscale state directory)
   path_provider: ^2.1.0
@@ -66,7 +67,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
   hive_generator: ^2.0.1
   build_runner: ^2.4.13
 

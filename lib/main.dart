@@ -14,7 +14,8 @@ import 'screens/lock_screen.dart';
 import 'services/biometric_provider.dart';
 import 'services/hive_adapters.dart';
 import 'services/onboarding_service.dart';
-import 'utils/theme_provider.dart';
+import 'services/tailscale_provider.dart';
+import 'services/tailscale_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,9 +34,12 @@ void main() async {
   await Hive.openBox<QuickCommand>('quick_commands');
 
   // Init embedded Tailscale node
+  TailscaleService? tailscaleService;
   try {
     final d = await getApplicationSupportDirectory();
     Tailscale.init(stateDir: d.path, logLevel: TailscaleLogLevel.silent);
+    tailscaleService = TailscaleService();
+    tailscaleService.initialize(d.path);
   } catch (e) {
     debugPrint("[TS] " + e.toString());
   }
@@ -46,6 +50,10 @@ void main() async {
         // Inject the already-initialized SharedPreferences so the
         // onboarding provider doesn't need to await again.
         sharedPrefsProvider.overrideWithValue(prefs),
+        // Inject the pre-initialized TailscaleService so providers
+        // don't create a fresh uninitialized instance.
+        if (tailscaleService != null)
+          tailscaleServiceProvider.overrideWithValue(tailscaleService),
       ],
       child: const OpaApp(),
     ),
@@ -85,13 +93,12 @@ class OpaApp extends ConsumerWidget {
 
   Widget _buildApp(BuildContext context, WidgetRef ref) {
     final router = ref.watch(appRouterProvider);
-    final amoledBlack = ref.watch(amoledBlackProvider);
 
     return MaterialApp.router(
       title: 'OPA',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.dark(amoledBlack: amoledBlack),
-      darkTheme: AppTheme.dark(amoledBlack: amoledBlack),
+      theme: AppTheme.dark(),
+      darkTheme: AppTheme.dark(),
       themeMode: ThemeMode.dark,
       routerConfig: router,
     );

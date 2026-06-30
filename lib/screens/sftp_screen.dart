@@ -104,7 +104,7 @@ class _SftpScreenState extends ConsumerState<SftpScreen> {
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: Colors.white.withOpacity(0.08)),
+          side: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
         ),
         backgroundColor: AppConstants.surfaceDark,
         title: Text('New Directory', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
@@ -142,7 +142,7 @@ class _SftpScreenState extends ConsumerState<SftpScreen> {
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: Colors.white.withOpacity(0.08)),
+          side: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
         ),
         backgroundColor: AppConstants.surfaceDark,
         title: Text('Delete ${entry.isDirectory ? 'Directory' : 'File'}',
@@ -180,7 +180,7 @@ class _SftpScreenState extends ConsumerState<SftpScreen> {
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: Colors.white.withOpacity(0.08)),
+          side: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
         ),
         backgroundColor: AppConstants.surfaceDark,
         title: Text('Rename', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
@@ -232,7 +232,7 @@ class _SftpScreenState extends ConsumerState<SftpScreen> {
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: Colors.white.withOpacity(0.08)),
+          side: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
         ),
         backgroundColor: AppConstants.surfaceDark,
         title: Text('Upload File', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
@@ -355,8 +355,8 @@ class _SftpScreenState extends ConsumerState<SftpScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: AppConstants.surfaceDark.withOpacity(0.5),
-        border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.05))),
+        color: AppConstants.surfaceDark.withValues(alpha: 0.5),
+        border: Border(bottom: BorderSide(color: Colors.white.withValues(alpha: 0.05))),
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
@@ -364,7 +364,7 @@ class _SftpScreenState extends ConsumerState<SftpScreen> {
           children: [
             _breadcrumbItem('/', _pathStack.length == 1, () => _navigateToPath('/')),
             for (int i = 0; i < parts.length; i++) ...[
-              Icon(Icons.chevron_right, size: 14, color: Colors.white.withOpacity(0.3)),
+              Icon(Icons.chevron_right, size: 14, color: Colors.white.withValues(alpha: 0.3)),
               _breadcrumbItem(
                 parts[i],
                 i == parts.length - 1,
@@ -383,7 +383,7 @@ class _SftpScreenState extends ConsumerState<SftpScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: isActive ? AppConstants.primaryGreen.withOpacity(0.1) : Colors.transparent,
+          color: isActive ? AppConstants.primaryGreen.withValues(alpha: 0.1) : Colors.transparent,
           borderRadius: BorderRadius.circular(6),
         ),
         child: Text(
@@ -391,7 +391,7 @@ class _SftpScreenState extends ConsumerState<SftpScreen> {
           style: GoogleFonts.jetBrainsMono(
             fontSize: 12,
             fontWeight: isActive ? FontWeight.w700 : FontWeight.w400,
-            color: isActive ? AppConstants.primaryGreen : Colors.white.withOpacity(0.5),
+            color: isActive ? AppConstants.primaryGreen : Colors.white.withValues(alpha: 0.5),
           ),
         ),
       ),
@@ -406,9 +406,9 @@ class _SftpScreenState extends ConsumerState<SftpScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.cloud_off_rounded, size: 64, color: Colors.white.withOpacity(0.1)),
+              Icon(Icons.cloud_off_rounded, size: 64, color: Colors.white.withValues(alpha: 0.1)),
               const SizedBox(height: 16),
-              Text(_error!, style: GoogleFonts.inter(color: Colors.white.withOpacity(0.5)), textAlign: TextAlign.center),
+              Text(_error!, style: GoogleFonts.inter(color: Colors.white.withValues(alpha: 0.5)), textAlign: TextAlign.center),
               const SizedBox(height: 16),
               ElevatedButton.icon(
                 onPressed: () => context.pop(),
@@ -430,9 +430,9 @@ class _SftpScreenState extends ConsumerState<SftpScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.folder_open_rounded, size: 64, color: Colors.white.withOpacity(0.1)),
+            Icon(Icons.folder_open_rounded, size: 64, color: Colors.white.withValues(alpha: 0.1)),
             const SizedBox(height: 16),
-            Text('Empty directory', style: GoogleFonts.inter(fontSize: 16, color: Colors.white.withOpacity(0.4))),
+            Text('Empty directory', style: GoogleFonts.inter(fontSize: 16, color: Colors.white.withValues(alpha: 0.4))),
           ],
         ),
       );
@@ -458,9 +458,9 @@ class _SftpScreenState extends ConsumerState<SftpScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
       child: Container(
         decoration: BoxDecoration(
-          color: AppConstants.surfaceDark.withOpacity(0.5),
+          color: AppConstants.surfaceDark.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: Colors.white.withOpacity(0.04)),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.04)),
         ),
         child: Material(
           color: Colors.transparent,
@@ -476,14 +476,14 @@ class _SftpScreenState extends ConsumerState<SftpScreen> {
                     width: 36, height: 36,
                     decoration: BoxDecoration(
                       color: isDir
-                          ? const Color(0xFF448AFF).withOpacity(0.1)
-                          : Colors.white.withOpacity(0.05),
+                          ? const Color(0xFF448AFF).withValues(alpha: 0.1)
+                          : Colors.white.withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
                       isDir ? Icons.folder_rounded : Icons.insert_drive_file_rounded,
                       size: 18,
-                      color: isDir ? const Color(0xFF448AFF) : Colors.white.withOpacity(0.4),
+                      color: isDir ? const Color(0xFF448AFF) : Colors.white.withValues(alpha: 0.4),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -495,7 +495,7 @@ class _SftpScreenState extends ConsumerState<SftpScreen> {
                           entry.filename,
                           style: GoogleFonts.jetBrainsMono(
                             fontSize: 13,
-                            color: Colors.white.withOpacity(0.85),
+                            color: Colors.white.withValues(alpha: 0.85),
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -505,7 +505,7 @@ class _SftpScreenState extends ConsumerState<SftpScreen> {
                             _formatSize(entry.size),
                             style: GoogleFonts.inter(
                               fontSize: 11,
-                              color: Colors.white.withOpacity(0.35),
+                              color: Colors.white.withValues(alpha: 0.35),
                             ),
                           ),
                         ],
@@ -513,7 +513,7 @@ class _SftpScreenState extends ConsumerState<SftpScreen> {
                     ),
                   ),
                   if (!isDir)
-                    Icon(Icons.chevron_right, size: 16, color: Colors.white.withOpacity(0.15)),
+                    Icon(Icons.chevron_right, size: 16, color: Colors.white.withValues(alpha: 0.15)),
                 ],
               ),
             ),
@@ -533,10 +533,10 @@ class _SftpScreenState extends ConsumerState<SftpScreen> {
           filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
           child: Container(
             decoration: BoxDecoration(
-              color: AppConstants.surfaceDark.withOpacity(0.9),
+              color: AppConstants.surfaceDark.withValues(alpha: 0.9),
               borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
               border: Border(
-                top: BorderSide(color: AppConstants.primaryGreen.withOpacity(0.15)),
+                top: BorderSide(color: AppConstants.primaryGreen.withValues(alpha: 0.15)),
               ),
             ),
             child: SafeArea(
@@ -548,7 +548,7 @@ class _SftpScreenState extends ConsumerState<SftpScreen> {
                       width: 36, height: 4,
                       margin: const EdgeInsets.only(top: 12, bottom: 8),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.15),
+                        color: Colors.white.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),

@@ -128,15 +128,15 @@ class _LockScreenState extends ConsumerState<LockScreen> {
       width: 88,
       height: 88,
       decoration: BoxDecoration(
-        color: AppConstants.primaryGreen.withOpacity(0.08),
+        color: AppConstants.primaryGreen.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: AppConstants.primaryGreen.withOpacity(0.15),
+          color: AppConstants.primaryGreen.withValues(alpha: 0.15),
           width: 1.2,
         ),
         boxShadow: [
           BoxShadow(
-            color: AppConstants.primaryGreen.withOpacity(0.08),
+            color: AppConstants.primaryGreen.withValues(alpha: 0.08),
             blurRadius: 24,
             spreadRadius: 4,
           ),
@@ -178,7 +178,7 @@ class _LockScreenState extends ConsumerState<LockScreen> {
       'OpenSSH Pocket Agent',
       style: GoogleFonts.inter(
         fontSize: 14,
-        color: Colors.white.withOpacity(0.4),
+        color: Colors.white.withValues(alpha: 0.4),
         letterSpacing: 1,
       ),
     )
@@ -234,10 +234,10 @@ class _LockScreenState extends ConsumerState<LockScreen> {
           width: 64,
           height: 64,
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.04),
+            color: Colors.white.withValues(alpha: 0.04),
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
-              color: Colors.white.withOpacity(0.08),
+              color: Colors.white.withValues(alpha: 0.08),
             ),
           ),
           child: const Icon(
@@ -281,10 +281,10 @@ class _LockScreenState extends ConsumerState<LockScreen> {
           width: 64,
           height: 64,
           decoration: BoxDecoration(
-            color: AppConstants.primaryGreen.withOpacity(0.08),
+            color: AppConstants.primaryGreen.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
-              color: AppConstants.primaryGreen.withOpacity(0.2),
+              color: AppConstants.primaryGreen.withValues(alpha: 0.2),
             ),
           ),
           child: const Icon(
@@ -296,7 +296,7 @@ class _LockScreenState extends ConsumerState<LockScreen> {
             .animate(onPlay: (c) => c.repeat())
             .shimmer(
               duration: 1500.ms,
-              color: AppConstants.primaryGreen.withOpacity(0.2),
+              color: AppConstants.primaryGreen.withValues(alpha: 0.2),
             ),
         const SizedBox(height: 20),
         const SizedBox(
@@ -312,7 +312,7 @@ class _LockScreenState extends ConsumerState<LockScreen> {
           'Authenticating...',
           style: GoogleFonts.inter(
             fontSize: 13,
-            color: Colors.white.withOpacity(0.5),
+            color: Colors.white.withValues(alpha: 0.5),
           ),
         ),
       ],
@@ -326,10 +326,10 @@ class _LockScreenState extends ConsumerState<LockScreen> {
           width: 64,
           height: 64,
           decoration: BoxDecoration(
-            color: AppConstants.primaryGreen.withOpacity(0.1),
+            color: AppConstants.primaryGreen.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
-              color: AppConstants.primaryGreen.withOpacity(0.2),
+              color: AppConstants.primaryGreen.withValues(alpha: 0.2),
             ),
           ),
           child: const Icon(
@@ -359,10 +359,10 @@ class _LockScreenState extends ConsumerState<LockScreen> {
           width: 64,
           height: 64,
           decoration: BoxDecoration(
-            color: Colors.red.withOpacity(0.08),
+            color: Colors.red.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
-              color: Colors.red.withOpacity(0.15),
+              color: Colors.red.withValues(alpha: 0.15),
             ),
           ),
           child: const Icon(
@@ -377,7 +377,7 @@ class _LockScreenState extends ConsumerState<LockScreen> {
             _errorMessage!,
             style: GoogleFonts.inter(
               fontSize: 13,
-              color: Colors.white.withOpacity(0.6),
+              color: Colors.white.withValues(alpha: 0.6),
             ),
             textAlign: TextAlign.center,
           ),
@@ -392,8 +392,8 @@ class _LockScreenState extends ConsumerState<LockScreen> {
               style: GoogleFonts.inter(fontWeight: FontWeight.w600),
             ),
             style: OutlinedButton.styleFrom(
-              foregroundColor: Colors.white.withOpacity(0.7),
-              side: BorderSide(color: Colors.white.withOpacity(0.15)),
+              foregroundColor: Colors.white.withValues(alpha: 0.7),
+              side: BorderSide(color: Colors.white.withValues(alpha: 0.15)),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
               ),
@@ -413,10 +413,10 @@ class _LockScreenState extends ConsumerState<LockScreen> {
           width: 64,
           height: 64,
           decoration: BoxDecoration(
-            color: const Color(0xFFFFAB40).withOpacity(0.08),
+            color: const Color(0xFFFFAB40).withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
-              color: const Color(0xFFFFAB40).withOpacity(0.15),
+              color: const Color(0xFFFFAB40).withValues(alpha: 0.15),
             ),
           ),
           child: const Icon(
@@ -431,7 +431,7 @@ class _LockScreenState extends ConsumerState<LockScreen> {
           style: GoogleFonts.inter(
             fontSize: 15,
             fontWeight: FontWeight.w600,
-            color: Colors.white.withOpacity(0.6),
+            color: Colors.white.withValues(alpha: 0.6),
           ),
         ),
         const SizedBox(height: 8),
@@ -439,7 +439,7 @@ class _LockScreenState extends ConsumerState<LockScreen> {
           'This device does not support fingerprint\nor face unlock.',
           style: GoogleFonts.inter(
             fontSize: 13,
-            color: Colors.white.withOpacity(0.35),
+            color: Colors.white.withValues(alpha: 0.35),
             height: 1.5,
           ),
           textAlign: TextAlign.center,

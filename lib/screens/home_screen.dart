@@ -25,7 +25,6 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen>
     with SingleTickerProviderStateMixin, WidgetsBindingObserver {
-  bool _updateChecked = false;
   NodeState? _tailscaleNodeState;
 
   @override
@@ -43,7 +42,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   Future<void> _checkForUpdate() async {
     final info = await UpdateService.checkForUpdate();
     if (!mounted || info == null) return;
-    setState(() => _updateChecked = true);
     _showUpdateDialog(info);
   }
 
@@ -68,7 +66,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           builder: (ctx) => AlertDialog(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
-              side: BorderSide(color: Colors.white.withOpacity(0.08)),
+              side: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
             ),
             backgroundColor: AppConstants.surfaceDark,
             title: const Text('Tailscale Auth Required'),
@@ -124,7 +122,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: Colors.white.withOpacity(0.08)),
+          side: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
         ),
         backgroundColor: AppConstants.surfaceDark,
         title: Row(
@@ -154,7 +152,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             Text(
               'OPA v${info.latestVersion} is ready to install.',
               style: GoogleFonts.inter(
-                color: Colors.white.withOpacity(0.8),
+                color: Colors.white.withValues(alpha: 0.8),
                 fontSize: 14,
               ),
             ),
@@ -166,7 +164,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   child: Text(
                     info.releaseNotes,
                     style: GoogleFonts.inter(
-                      color: Colors.white.withOpacity(0.5),
+                      color: Colors.white.withValues(alpha: 0.5),
                       fontSize: 13,
                       height: 1.4,
                     ),
@@ -243,10 +241,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     }
     showDialog(context: context, builder: (ctx) {
       return AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius:BorderRadius.circular(16),side:BorderSide(color:Colors.white.withOpacity(0.08))),
+        shape: RoundedRectangleBorder(borderRadius:BorderRadius.circular(16),side:BorderSide(color:Colors.white.withValues(alpha: 0.08))),
         backgroundColor: AppConstants.surfaceDark,
         title: Row(children: [
-          Container(width:10,height:10,decoration:BoxDecoration(shape:BoxShape.circle,color:stateColor,boxShadow:[BoxShadow(color:stateColor.withOpacity(0.4),blurRadius:6)])),
+          Container(width:10,height:10,decoration:BoxDecoration(shape:BoxShape.circle,color:stateColor,boxShadow:[BoxShadow(color:stateColor.withValues(alpha: 0.4),blurRadius:6)])),
           SizedBox(width:10),
           Text('Tailscale Node'),
         ]),
@@ -315,9 +313,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               height: 28,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppConstants.primaryGreen.withOpacity(0.1),
+                color: AppConstants.primaryGreen.withValues(alpha: 0.1),
                 border:
-                    Border.all(color: AppConstants.primaryGreen.withOpacity(0.2)),
+                    Border.all(color: AppConstants.primaryGreen.withValues(alpha: 0.2)),
               ),
               child: const Icon(
                 Icons.terminal_rounded,
@@ -341,7 +339,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           IconButton(
             icon: Icon(
               Icons.vpn_key_rounded,
-              color: Colors.white.withOpacity(0.6),
+              color: Colors.white.withValues(alpha: 0.6),
             ),
             tooltip: 'SSH Keys',
             onPressed: () => context.push('/keys'),
@@ -349,7 +347,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           IconButton(
             icon: Icon(
               Icons.flash_on_rounded,
-              color: Colors.white.withOpacity(0.6),
+              color: Colors.white.withValues(alpha: 0.6),
             ),
             tooltip: 'Quick Commands',
             onPressed: () => context.push('/commands'),
@@ -357,7 +355,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           IconButton(
             icon: Icon(
               Icons.settings_rounded,
-              color: Colors.white.withOpacity(0.6),
+              color: Colors.white.withValues(alpha: 0.6),
             ),
             tooltip: 'Settings',
             onPressed: () => context.push('/settings'),
@@ -406,11 +404,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                           ),
                           decoration: BoxDecoration(
                             color:
-                                AppConstants.primaryGreen.withOpacity(0.12),
+                                AppConstants.primaryGreen.withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(
                               color: AppConstants.primaryGreen
-                                  .withOpacity(0.2),
+                                  .withValues(alpha: 0.2),
                             ),
                           ),
                           child: Text(
@@ -439,7 +437,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     'Tap to connect to your remote machines',
                     style: GoogleFonts.inter(
                       fontSize: 13,
-                      color: Colors.white.withOpacity(0.35),
+                      color: Colors.white.withValues(alpha: 0.35),
                     ),
                   )
                       .animate()
@@ -492,10 +490,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         vertical: 2,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFFAB40).withOpacity(0.12),
+                        color: const Color(0xFFFFAB40).withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
-                          color: const Color(0xFFFFAB40).withOpacity(0.2),
+                          color: const Color(0xFFFFAB40).withValues(alpha: 0.2),
                         ),
                       ),
                       child: Text(
@@ -533,7 +531,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         Icon(
                           Icons.arrow_forward_rounded,
                           size: 16,
-                          color: AppConstants.primaryGreen.withOpacity(0.7),
+                          color: AppConstants.primaryGreen.withValues(alpha: 0.7),
                         ),
                       ],
                     ),
@@ -572,12 +570,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           Icon(
             icon,
             size: 64,
-            color: Colors.white.withOpacity(0.1),
+            color: Colors.white.withValues(alpha: 0.1),
           )
               .animate(onPlay: (c) => c.repeat())
               .shimmer(
                   duration: 2500.ms,
-                  color: AppConstants.primaryGreen.withOpacity(0.08))
+                  color: AppConstants.primaryGreen.withValues(alpha: 0.08))
               .scale(
                 begin: const Offset(1, 1),
                 end: const Offset(1.02, 1.02),
@@ -590,7 +588,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             style: GoogleFonts.inter(
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: Colors.white.withOpacity(0.45),
+              color: Colors.white.withValues(alpha: 0.45),
             ),
           ),
           const SizedBox(height: 8),
@@ -598,7 +596,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             subtitle,
             style: GoogleFonts.inter(
               fontSize: 14,
-              color: Colors.white.withOpacity(0.25),
+              color: Colors.white.withValues(alpha: 0.25),
             ),
             textAlign: TextAlign.center,
           ),
@@ -613,14 +611,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 3),
       child: Container(
             decoration: BoxDecoration(
-              color: AppConstants.surfaceDark.withOpacity(0.5),
+              color: AppConstants.surfaceDark.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                color: Colors.white.withOpacity(0.04),
+                color: Colors.white.withValues(alpha: 0.04),
               ),
               boxShadow: [
                 BoxShadow(
-                  color: accent.withOpacity(0.02),
+                  color: accent.withValues(alpha: 0.02),
                   blurRadius: 12,
                 ),
               ],
@@ -639,13 +637,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         width: 28,
                         height: 28,
                         decoration: BoxDecoration(
-                          color: accent.withOpacity(0.1),
+                          color: accent.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(7),
                         ),
                         child: Icon(
                           Icons.play_arrow_rounded,
                           size: 16,
-                          color: accent.withOpacity(0.8),
+                          color: accent.withValues(alpha: 0.8),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -654,7 +652,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                           cmd.label,
                           style: GoogleFonts.inter(
                             fontSize: 14,
-                            color: Colors.white.withOpacity(0.8),
+                            color: Colors.white.withValues(alpha: 0.8),
                             fontWeight: FontWeight.w500,
                           ),
                           overflow: TextOverflow.ellipsis,
@@ -664,7 +662,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         '\$ ${cmd.command}',
                         style: GoogleFonts.jetBrainsMono(
                           fontSize: 11,
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha: 0.2),
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -792,7 +790,7 @@ class _MenuItem extends StatelessWidget {
           height: 48,
           child: FloatingActionButton.small(
             heroTag: 'fab_menu_' + index.toString(),
-            backgroundColor: color.withOpacity(0.15),
+            backgroundColor: color.withValues(alpha: 0.15),
             onPressed: onTap,
             child: Icon(icon, color: color, size: 20),
           ),

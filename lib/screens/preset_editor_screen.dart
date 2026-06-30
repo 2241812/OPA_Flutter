@@ -49,7 +49,7 @@ class _PresetEditorScreenState extends ConsumerState<PresetEditorScreen> {
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: AppConstants.primaryGreen.withOpacity(0.25),
+              color: AppConstants.primaryGreen.withValues(alpha: 0.25),
               blurRadius: 16,
               spreadRadius: 2,
             ),
@@ -74,12 +74,12 @@ class _PresetEditorScreenState extends ConsumerState<PresetEditorScreen> {
             Icon(
               Icons.extension_rounded,
               size: 56,
-              color: Colors.white.withOpacity(0.1),
+              color: Colors.white.withValues(alpha: 0.1),
             )
                 .animate(onPlay: (c) => c.repeat())
                 .shimmer(
                     duration: 2500.ms,
-                    color: const Color(0xFFFFAB40).withOpacity(0.08))
+                    color: const Color(0xFFFFAB40).withValues(alpha: 0.08))
                 .scale(
                   begin: const Offset(1, 1),
                   end: const Offset(1.02, 1.02),
@@ -92,7 +92,7 @@ class _PresetEditorScreenState extends ConsumerState<PresetEditorScreen> {
               style: GoogleFonts.inter(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: Colors.white.withOpacity(0.4),
+                color: Colors.white.withValues(alpha: 0.4),
               ),
             ),
             const SizedBox(height: 6),
@@ -101,7 +101,7 @@ class _PresetEditorScreenState extends ConsumerState<PresetEditorScreen> {
               'Tap + to get started.',
               style: GoogleFonts.inter(
                 fontSize: 13,
-                color: Colors.white.withOpacity(0.25),
+                color: Colors.white.withValues(alpha: 0.25),
               ),
               textAlign: TextAlign.center,
             ),
@@ -123,7 +123,7 @@ class _PresetEditorScreenState extends ConsumerState<PresetEditorScreen> {
         onDismissed: (_) => _deletePreset(preset),
         background: Container(
           decoration: BoxDecoration(
-            color: Colors.red.withOpacity(0.15),
+            color: Colors.red.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(14),
           ),
           alignment: Alignment.centerRight,
@@ -132,9 +132,9 @@ class _PresetEditorScreenState extends ConsumerState<PresetEditorScreen> {
         ),
         child: Container(
           decoration: BoxDecoration(
-            color: AppConstants.surfaceDark.withOpacity(0.7),
+            color: AppConstants.surfaceDark.withValues(alpha: 0.7),
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: Colors.white.withOpacity(0.06)),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
           ),
           child: Material(
             color: Colors.transparent,
@@ -149,10 +149,10 @@ class _PresetEditorScreenState extends ConsumerState<PresetEditorScreen> {
                       width: 42,
                       height: 42,
                       decoration: BoxDecoration(
-                        color: accent.withOpacity(0.12),
+                        color: accent.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(11),
                         border: Border.all(
-                          color: accent.withOpacity(0.2),
+                          color: accent.withValues(alpha: 0.2),
                           width: 1,
                         ),
                       ),
@@ -172,7 +172,7 @@ class _PresetEditorScreenState extends ConsumerState<PresetEditorScreen> {
                             style: GoogleFonts.inter(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
-                              color: Colors.white.withOpacity(0.9),
+                              color: Colors.white.withValues(alpha: 0.9),
                             ),
                           ),
                           const SizedBox(height: 3),
@@ -180,7 +180,7 @@ class _PresetEditorScreenState extends ConsumerState<PresetEditorScreen> {
                             '\$ ${preset.command}',
                             style: GoogleFonts.jetBrainsMono(
                               fontSize: 11,
-                              color: Colors.white.withOpacity(0.35),
+                              color: Colors.white.withValues(alpha: 0.35),
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -193,14 +193,14 @@ class _PresetEditorScreenState extends ConsumerState<PresetEditorScreen> {
                       height: 6,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: accent.withOpacity(0.4),
+                        color: accent.withValues(alpha: 0.4),
                       ),
                     ),
                     const SizedBox(width: 8),
                     Icon(
                       Icons.chevron_right_rounded,
                       size: 18,
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                     ),
                   ],
                 ),
@@ -242,7 +242,7 @@ class _PresetEditorScreenState extends ConsumerState<PresetEditorScreen> {
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: Colors.white.withOpacity(0.08)),
+          side: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
         ),
         backgroundColor: AppConstants.surfaceDark,
         title: Text(
@@ -261,7 +261,7 @@ class _PresetEditorScreenState extends ConsumerState<PresetEditorScreen> {
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red.withOpacity(0.2),
+              backgroundColor: Colors.red.withValues(alpha: 0.2),
             ),
             child: const Text('Delete'),
           ),
@@ -288,7 +288,7 @@ class _PresetEditorScreenState extends ConsumerState<PresetEditorScreen> {
         builder: (context, setDialogState) => AlertDialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
-            side: BorderSide(color: Colors.white.withOpacity(0.08)),
+            side: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
           ),
           backgroundColor: AppConstants.surfaceDark,
           title: Text(
@@ -327,7 +327,7 @@ class _PresetEditorScreenState extends ConsumerState<PresetEditorScreen> {
                       'Accent',
                       style: GoogleFonts.inter(
                         fontSize: 12,
-                        color: Colors.white.withOpacity(0.5),
+                        color: Colors.white.withValues(alpha: 0.5),
                       ),
                     ),
                     const SizedBox(width: 12),

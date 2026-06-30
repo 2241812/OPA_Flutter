@@ -9,7 +9,6 @@ import '../services/export_service.dart';
 import '../utils/app_version.dart';
 import '../utils/constants.dart';
 import '../utils/terminal_settings_provider.dart';
-import '../utils/theme_provider.dart';
 
 /// Settings screen with display preferences and app info.
 class SettingsScreen extends ConsumerWidget {
@@ -29,7 +28,6 @@ class SettingsScreen extends ConsumerWidget {
         children: [
           _sectionHeader('Display'),
           const SizedBox(height: 8),
-          _AmoledTile(),
           const SizedBox(height: 8),
           _BiometricTile(),
           const SizedBox(height: 24),
@@ -65,55 +63,11 @@ class SettingsScreen extends ConsumerWidget {
         style: GoogleFonts.inter(
           fontSize: 13,
           fontWeight: FontWeight.w600,
-          color: Colors.white.withOpacity(0.4),
+          color: Colors.white.withValues(alpha: 0.4),
           letterSpacing: 0.5,
         ),
       ),
     );
-  }
-}
-
-class _AmoledTile extends ConsumerWidget {
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final amoled = ref.watch(amoledBlackProvider);
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppConstants.surfaceDark.withOpacity(0.7),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.white.withOpacity(0.06)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 40, height: 40,
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: const Icon(Icons.dark_mode_rounded, size: 20, color: Color(0xFF448AFF)),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('AMOLED Black', style: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white)),
-                const SizedBox(height: 2),
-                Text('Pure black background saves battery on OLED screens', style: GoogleFonts.inter(fontSize: 12, color: Colors.white.withOpacity(0.45))),
-              ],
-            ),
-          ),
-          Switch(
-            value: amoled,
-            onChanged: (_) => ref.read(amoledBlackProvider.notifier).toggle(),
-            activeThumbColor: AppConstants.primaryGreen,
-            inactiveTrackColor: Colors.white.withOpacity(0.1),
-          ),
-        ],
-      ),
-    ).animate().fadeIn(duration: 350.ms, curve: Curves.easeOut);
   }
 }
 
@@ -125,16 +79,16 @@ class _BiometricTile extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppConstants.surfaceDark.withOpacity(0.7),
+        color: AppConstants.surfaceDark.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.white.withOpacity(0.06)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
       ),
       child: Row(
         children: [
           Container(
             width: 40, height: 40,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
+              color: Colors.white.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(10),
             ),
             child: const Icon(Icons.fingerprint_rounded, size: 20, color: AppConstants.primaryGreen),
@@ -146,7 +100,7 @@ class _BiometricTile extends ConsumerWidget {
               children: [
                 Text('Biometric Lock', style: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white)),
                 const SizedBox(height: 2),
-                Text('Require fingerprint or face to open the app', style: GoogleFonts.inter(fontSize: 12, color: Colors.white.withOpacity(0.45))),
+                Text('Require fingerprint or face to open the app', style: GoogleFonts.inter(fontSize: 12, color: Colors.white.withValues(alpha: 0.45))),
               ],
             ),
           ),
@@ -154,7 +108,7 @@ class _BiometricTile extends ConsumerWidget {
             value: lockEnabled,
             onChanged: (_) => ref.read(biometricLockEnabledProvider.notifier).toggle(),
             activeThumbColor: AppConstants.primaryGreen,
-            inactiveTrackColor: Colors.white.withOpacity(0.1),
+            inactiveTrackColor: Colors.white.withValues(alpha: 0.1),
           ),
         ],
       ),
@@ -171,9 +125,9 @@ class _FontSizeTile extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppConstants.surfaceDark.withOpacity(0.7),
+        color: AppConstants.surfaceDark.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.white.withOpacity(0.06)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -183,7 +137,7 @@ class _FontSizeTile extends ConsumerWidget {
               Container(
                 width: 40, height: 40,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.05),
+                  color: Colors.white.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(Icons.text_fields_rounded, size: 20, color: Color(0xFF448AFF)),
@@ -208,7 +162,7 @@ class _FontSizeTile extends ConsumerWidget {
             max: AppConstants.maxFontSize,
             divisions: 52,
             activeColor: AppConstants.primaryGreen,
-            inactiveColor: Colors.white.withOpacity(0.1),
+            inactiveColor: Colors.white.withValues(alpha: 0.1),
             onChanged: (v) => ref.read(terminalFontSizeProvider.notifier).setSize(v),
           ),
         ],
@@ -227,9 +181,9 @@ class _ScrollbackTile extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppConstants.surfaceDark.withOpacity(0.7),
+        color: AppConstants.surfaceDark.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.white.withOpacity(0.06)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -239,7 +193,7 @@ class _ScrollbackTile extends ConsumerWidget {
               Container(
                 width: 40, height: 40,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.05),
+                  color: Colors.white.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(Icons.list_rounded, size: 20, color: Color(0xFFFFAB40)),
@@ -264,7 +218,7 @@ class _ScrollbackTile extends ConsumerWidget {
             max: 50000,
             divisions: 99,
             activeColor: Color(0xFFFFAB40),
-            inactiveColor: Colors.white.withOpacity(0.1),
+            inactiveColor: Colors.white.withValues(alpha: 0.1),
             onChanged: (v) => ref.read(terminalScrollbackProvider.notifier).setLines(v.round()),
           ),
         ],
@@ -280,9 +234,9 @@ class _KeepaliveTile extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppConstants.surfaceDark.withOpacity(0.7),
+        color: AppConstants.surfaceDark.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.white.withOpacity(0.06)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -292,7 +246,7 @@ class _KeepaliveTile extends ConsumerWidget {
               Container(
                 width: 40, height: 40,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.05),
+                  color: Colors.white.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(Icons.timer_outlined, size: 20, color: Color(0xFF18FFFF)),
@@ -317,7 +271,7 @@ class _KeepaliveTile extends ConsumerWidget {
             max: 300,
             divisions: 59,
             activeColor: Color(0xFF18FFFF),
-            inactiveColor: Colors.white.withOpacity(0.1),
+            inactiveColor: Colors.white.withValues(alpha: 0.1),
             onChanged: (v) => ref.read(terminalKeepaliveProvider.notifier).setInterval(v.round()),
           ),
         ],
@@ -334,9 +288,9 @@ class _ExportTile extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppConstants.surfaceDark.withOpacity(0.7),
+        color: AppConstants.surfaceDark.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.white.withOpacity(0.06)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
       ),
       child: Material(
         color: Colors.transparent,
@@ -366,7 +320,7 @@ class _ExportTile extends ConsumerWidget {
               Container(
                 width: 40, height: 40,
                 decoration: BoxDecoration(
-                  color: AppConstants.primaryGreen.withOpacity(0.1),
+                  color: AppConstants.primaryGreen.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(Icons.file_upload_outlined, size: 20, color: AppConstants.primaryGreen),
@@ -378,11 +332,11 @@ class _ExportTile extends ConsumerWidget {
                   children: [
                     Text('Export', style: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white)),
                     const SizedBox(height: 2),
-                    Text('Copy profiles and commands to clipboard', style: GoogleFonts.inter(fontSize: 12, color: Colors.white.withOpacity(0.45))),
+                    Text('Copy profiles and commands to clipboard', style: GoogleFonts.inter(fontSize: 12, color: Colors.white.withValues(alpha: 0.45))),
                   ],
                 ),
               ),
-              Icon(Icons.chevron_right, color: Colors.white.withOpacity(0.2)),
+              Icon(Icons.chevron_right, color: Colors.white.withValues(alpha: 0.2)),
             ],
           ),
         ),
@@ -397,9 +351,9 @@ class _ImportTile extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppConstants.surfaceDark.withOpacity(0.7),
+        color: AppConstants.surfaceDark.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.white.withOpacity(0.06)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
       ),
       child: Material(
         color: Colors.transparent,
@@ -411,7 +365,7 @@ class _ImportTile extends ConsumerWidget {
               Container(
                 width: 40, height: 40,
                 decoration: BoxDecoration(
-                  color: Color(0xFF448AFF).withOpacity(0.1),
+                  color: Color(0xFF448AFF).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(Icons.file_download_outlined, size: 20, color: Color(0xFF448AFF)),
@@ -423,11 +377,11 @@ class _ImportTile extends ConsumerWidget {
                   children: [
                     Text('Import', style: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white)),
                     const SizedBox(height: 2),
-                    Text('Paste exported JSON to restore data', style: GoogleFonts.inter(fontSize: 12, color: Colors.white.withOpacity(0.45))),
+                    Text('Paste exported JSON to restore data', style: GoogleFonts.inter(fontSize: 12, color: Colors.white.withValues(alpha: 0.45))),
                   ],
                 ),
               ),
-              Icon(Icons.chevron_right, color: Colors.white.withOpacity(0.2)),
+              Icon(Icons.chevron_right, color: Colors.white.withValues(alpha: 0.2)),
             ],
           ),
         ),
@@ -442,7 +396,7 @@ class _ImportTile extends ConsumerWidget {
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: Colors.white.withOpacity(0.08)),
+          side: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
         ),
         backgroundColor: AppConstants.surfaceDark,
         title: Text('Import Data', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
@@ -451,7 +405,7 @@ class _ImportTile extends ConsumerWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Paste the JSON you exported earlier.', style: GoogleFonts.inter(fontSize: 13, color: Colors.white.withOpacity(0.6))),
+              Text('Paste the JSON you exported earlier.', style: GoogleFonts.inter(fontSize: 13, color: Colors.white.withValues(alpha: 0.6))),
               const SizedBox(height: 12),
               TextField(
                 controller: controller,
@@ -511,9 +465,9 @@ class _AboutCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppConstants.surfaceDark.withOpacity(0.7),
+        color: AppConstants.surfaceDark.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.white.withOpacity(0.06)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
       ),
       child: Column(
         children: [
@@ -522,9 +476,9 @@ class _AboutCard extends StatelessWidget {
               Container(
                 width: 40, height: 40,
                 decoration: BoxDecoration(
-                  color: AppConstants.primaryGreen.withOpacity(0.1),
+                  color: AppConstants.primaryGreen.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: AppConstants.primaryGreen.withOpacity(0.2)),
+                  border: Border.all(color: AppConstants.primaryGreen.withValues(alpha: 0.2)),
                 ),
                 child: const Icon(Icons.terminal_rounded, size: 20, color: AppConstants.primaryGreen),
               ),
@@ -549,8 +503,8 @@ class _AboutCard extends StatelessWidget {
               icon: const Icon(Icons.code_rounded, size: 18),
               label: Text('View on GitHub', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
               style: OutlinedButton.styleFrom(
-                foregroundColor: Colors.white.withOpacity(0.7),
-                side: BorderSide(color: Colors.white.withOpacity(0.12)),
+                foregroundColor: Colors.white.withValues(alpha: 0.7),
+                side: BorderSide(color: Colors.white.withValues(alpha: 0.12)),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 padding: const EdgeInsets.symmetric(vertical: 12),
               ),
@@ -575,14 +529,14 @@ class _VersionBadge extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
-                color: AppConstants.primaryGreen.withOpacity(0.1),
+                color: AppConstants.primaryGreen.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: AppConstants.primaryGreen.withOpacity(0.2)),
+                border: Border.all(color: AppConstants.primaryGreen.withValues(alpha: 0.2)),
               ),
               child: Text('v$version', style: GoogleFonts.jetBrainsMono(fontSize: 11, fontWeight: FontWeight.w600, color: AppConstants.primaryGreen)),
             ),
             const SizedBox(width: 8),
-            Text('Android', style: GoogleFonts.inter(fontSize: 12, color: Colors.white.withOpacity(0.35))),
+            Text('Android', style: GoogleFonts.inter(fontSize: 12, color: Colors.white.withValues(alpha: 0.35))),
           ],
         );
       },

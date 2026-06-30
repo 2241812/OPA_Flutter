@@ -77,10 +77,10 @@ class _QuickCommandsScreenState extends ConsumerState<QuickCommandsScreen> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 7, vertical: 2),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFFAB40).withOpacity(0.12),
+                      color: const Color(0xFFFFAB40).withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: const Color(0xFFFFAB40).withOpacity(0.2),
+                        color: const Color(0xFFFFAB40).withValues(alpha: 0.2),
                       ),
                     ),
                     child: Text(
@@ -112,7 +112,7 @@ class _QuickCommandsScreenState extends ConsumerState<QuickCommandsScreen> {
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: AppConstants.primaryGreen.withOpacity(0.25),
+              color: AppConstants.primaryGreen.withValues(alpha: 0.25),
               blurRadius: 16,
               spreadRadius: 2,
             ),
@@ -135,10 +135,10 @@ class _QuickCommandsScreenState extends ConsumerState<QuickCommandsScreen> {
       child: Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: const Color(0xFFFFAB40).withOpacity(0.06),
+              color: const Color(0xFFFFAB40).withValues(alpha: 0.06),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: const Color(0xFFFFAB40).withOpacity(0.15),
+                color: const Color(0xFFFFAB40).withValues(alpha: 0.15),
               ),
             ),
             child: Row(
@@ -147,7 +147,7 @@ class _QuickCommandsScreenState extends ConsumerState<QuickCommandsScreen> {
                   width: 32,
                   height: 32,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFFAB40).withOpacity(0.1),
+                    color: const Color(0xFFFFAB40).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Icon(
@@ -163,7 +163,7 @@ class _QuickCommandsScreenState extends ConsumerState<QuickCommandsScreen> {
                     'or tap a preset below to get started.',
                     style: GoogleFonts.inter(
                       fontSize: 12,
-                      color: Colors.white.withOpacity(0.55),
+                      color: Colors.white.withValues(alpha: 0.55),
                       height: 1.5,
                     ),
                   ),
@@ -233,7 +233,7 @@ class _QuickCommandsScreenState extends ConsumerState<QuickCommandsScreen> {
             style: GoogleFonts.inter(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: Colors.white.withOpacity(0.4),
+              color: Colors.white.withValues(alpha: 0.4),
               letterSpacing: 0.8,
             ),
           ),
@@ -263,14 +263,14 @@ class _QuickCommandsScreenState extends ConsumerState<QuickCommandsScreen> {
         width: 76,
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
         decoration: BoxDecoration(
-          color: AppConstants.surfaceDark.withOpacity(0.6),
+          color: AppConstants.surfaceDark.withValues(alpha: 0.6),
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: preset.color.withOpacity(0.15),
+            color: preset.color.withValues(alpha: 0.15),
           ),
           boxShadow: [
             BoxShadow(
-              color: preset.color.withOpacity(0.03),
+              color: preset.color.withValues(alpha: 0.03),
               blurRadius: 10,
             ),
           ],
@@ -283,9 +283,9 @@ class _QuickCommandsScreenState extends ConsumerState<QuickCommandsScreen> {
               height: 38,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: preset.color.withOpacity(0.12),
+                color: preset.color.withValues(alpha: 0.12),
                 border: Border.all(
-                  color: preset.color.withOpacity(0.25),
+                  color: preset.color.withValues(alpha: 0.25),
                   width: 1,
                 ),
               ),
@@ -297,7 +297,7 @@ class _QuickCommandsScreenState extends ConsumerState<QuickCommandsScreen> {
               style: GoogleFonts.inter(
                 fontSize: 10,
                 fontWeight: FontWeight.w600,
-                color: Colors.white.withOpacity(0.8),
+                color: Colors.white.withValues(alpha: 0.8),
               ),
               textAlign: TextAlign.center,
               maxLines: 1,
@@ -423,12 +423,12 @@ class _QuickCommandsScreenState extends ConsumerState<QuickCommandsScreen> {
           Icon(
             Icons.flash_on_rounded,
             size: 56,
-            color: Colors.white.withOpacity(0.1),
+            color: Colors.white.withValues(alpha: 0.1),
           )
               .animate(onPlay: (c) => c.repeat())
               .shimmer(
                   duration: 2500.ms,
-                  color: const Color(0xFFFFAB40).withOpacity(0.08))
+                  color: const Color(0xFFFFAB40).withValues(alpha: 0.08))
               .scale(
                 begin: const Offset(1, 1),
                 end: const Offset(1.02, 1.02),
@@ -441,7 +441,7 @@ class _QuickCommandsScreenState extends ConsumerState<QuickCommandsScreen> {
             style: GoogleFonts.inter(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: Colors.white.withOpacity(0.4),
+              color: Colors.white.withValues(alpha: 0.4),
             ),
           ),
           const SizedBox(height: 6),
@@ -449,7 +449,7 @@ class _QuickCommandsScreenState extends ConsumerState<QuickCommandsScreen> {
             'Tap a preset above to launch, or + to create a custom command',
             style: GoogleFonts.inter(
               fontSize: 13,
-              color: Colors.white.withOpacity(0.25),
+              color: Colors.white.withValues(alpha: 0.25),
             ),
             textAlign: TextAlign.center,
           ),
@@ -469,12 +469,12 @@ class _QuickCommandsScreenState extends ConsumerState<QuickCommandsScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
       child: Container(
             decoration: BoxDecoration(
-              color: AppConstants.surfaceDark.withOpacity(0.7),
+              color: AppConstants.surfaceDark.withValues(alpha: 0.7),
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: Colors.white.withOpacity(0.06)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
               boxShadow: [
                 BoxShadow(
-                  color: accent.withOpacity(0.03),
+                  color: accent.withValues(alpha: 0.03),
                   blurRadius: 16,
                 ),
               ],
@@ -492,10 +492,10 @@ class _QuickCommandsScreenState extends ConsumerState<QuickCommandsScreen> {
                         width: 42,
                         height: 42,
                         decoration: BoxDecoration(
-                          color: accent.withOpacity(0.12),
+                          color: accent.withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(11),
                           border: Border.all(
-                            color: accent.withOpacity(0.2),
+                            color: accent.withValues(alpha: 0.2),
                             width: 1,
                           ),
                         ),
@@ -520,7 +520,7 @@ class _QuickCommandsScreenState extends ConsumerState<QuickCommandsScreen> {
                               '\$ ${cmd.command}',
                               style: GoogleFonts.jetBrainsMono(
                                 fontSize: 11,
-                                color: Colors.white.withOpacity(0.4),
+                                color: Colors.white.withValues(alpha: 0.4),
                               ),
                               overflow: TextOverflow.ellipsis,
                               maxLines: 2,
@@ -531,7 +531,7 @@ class _QuickCommandsScreenState extends ConsumerState<QuickCommandsScreen> {
                                 '→ ${profile.shortLabel}',
                                 style: GoogleFonts.inter(
                                   fontSize: 10,
-                                  color: Colors.white.withOpacity(0.3),
+                                  color: Colors.white.withValues(alpha: 0.3),
                                 ),
                               ),
                             ],
@@ -540,7 +540,7 @@ class _QuickCommandsScreenState extends ConsumerState<QuickCommandsScreen> {
                       ),
                       PopupMenuButton<String>(
                         icon: Icon(Icons.more_vert_rounded,
-                            color: Colors.white.withOpacity(0.4)),
+                            color: Colors.white.withValues(alpha: 0.4)),
                         onSelected: (action) {
                           if (action == 'edit') {
                             _showCommandEditor(command: cmd);
@@ -555,7 +555,7 @@ class _QuickCommandsScreenState extends ConsumerState<QuickCommandsScreen> {
                               children: [
                                 Icon(Icons.edit_rounded,
                                     size: 18,
-                                    color: Colors.white.withOpacity(0.7)),
+                                    color: Colors.white.withValues(alpha: 0.7)),
                                 const SizedBox(width: 12),
                                 const Text('Edit'),
                               ],
@@ -639,12 +639,12 @@ class _QuickCommandsScreenState extends ConsumerState<QuickCommandsScreen> {
             maxChildSize: 0.9,
             builder: (context, scrollController) => Container(
               decoration: BoxDecoration(
-                color: AppConstants.backgroundDark.withOpacity(0.95),
+                color: AppConstants.backgroundDark.withValues(alpha: 0.95),
                 borderRadius:
                     const BorderRadius.vertical(top: Radius.circular(20)),
                 border: Border(
                   top: BorderSide(
-                    color: accent.withOpacity(0.2),
+                    color: accent.withValues(alpha: 0.2),
                     width: 1,
                   ),
                 ),
@@ -655,10 +655,10 @@ class _QuickCommandsScreenState extends ConsumerState<QuickCommandsScreen> {
                   Container(
                     padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
                     decoration: BoxDecoration(
-                      color: AppConstants.surfaceDark.withOpacity(0.6),
+                      color: AppConstants.surfaceDark.withValues(alpha: 0.6),
                       border: Border(
                         bottom: BorderSide(
-                          color: Colors.white.withOpacity(0.05),
+                          color: Colors.white.withValues(alpha: 0.05),
                         ),
                       ),
                     ),
@@ -668,7 +668,7 @@ class _QuickCommandsScreenState extends ConsumerState<QuickCommandsScreen> {
                           width: 28,
                           height: 28,
                           decoration: BoxDecoration(
-                            color: accent.withOpacity(0.1),
+                            color: accent.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(7),
                           ),
                           child: Icon(
@@ -692,7 +692,7 @@ class _QuickCommandsScreenState extends ConsumerState<QuickCommandsScreen> {
                           'on ${profile.shortLabel}',
                           style: GoogleFonts.inter(
                             fontSize: 11,
-                            color: Colors.white.withOpacity(0.4),
+                            color: Colors.white.withValues(alpha: 0.4),
                           ),
                         ),
                       ],
@@ -717,7 +717,7 @@ class _QuickCommandsScreenState extends ConsumerState<QuickCommandsScreen> {
                                 Text(
                                   'Running command...',
                                   style: GoogleFonts.inter(
-                                    color: Colors.white.withOpacity(0.4),
+                                    color: Colors.white.withValues(alpha: 0.4),
                                     fontSize: 13,
                                   ),
                                 ),
@@ -738,7 +738,7 @@ class _QuickCommandsScreenState extends ConsumerState<QuickCommandsScreen> {
                               result,
                               style: GoogleFonts.jetBrainsMono(
                                 fontSize: 12,
-                                color: Colors.white.withOpacity(0.85),
+                                color: Colors.white.withValues(alpha: 0.85),
                                 height: 1.55,
                               ),
                             ),
@@ -818,12 +818,12 @@ class _QuickCommandsScreenState extends ConsumerState<QuickCommandsScreen> {
           child: StatefulBuilder(
             builder: (context, setModalState) => Container(
               decoration: BoxDecoration(
-                color: AppConstants.surfaceDark.withOpacity(0.95),
+                color: AppConstants.surfaceDark.withValues(alpha: 0.95),
                 borderRadius:
                     const BorderRadius.vertical(top: Radius.circular(20)),
                 border: Border(
                   top: BorderSide(
-                    color: AppConstants.primaryGreen.withOpacity(0.15),
+                    color: AppConstants.primaryGreen.withValues(alpha: 0.15),
                   ),
                 ),
               ),
@@ -844,7 +844,7 @@ class _QuickCommandsScreenState extends ConsumerState<QuickCommandsScreen> {
                       height: 4,
                       margin: const EdgeInsets.only(bottom: 16),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.15),
+                        color: Colors.white.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),

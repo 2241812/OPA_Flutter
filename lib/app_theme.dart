@@ -7,9 +7,9 @@ import 'utils/constants.dart';
 class AppTheme {
   AppTheme._();
 
-  static ThemeData dark({bool amoledBlack = false}) {
-    final bgColor = amoledBlack ? Colors.black : AppConstants.backgroundDark;
-    final surfaceColor = amoledBlack ? Colors.black : AppConstants.surfaceDark;
+  static ThemeData dark() {
+    final bgColor = Colors.black;
+    final surfaceColor = Colors.black;
 
     final colorScheme = ColorScheme.fromSeed(
       seedColor: AppConstants.primaryGreen,
@@ -41,17 +41,17 @@ class AppTheme {
           fontWeight: FontWeight.w600,
           letterSpacing: 0.8,
         ),
-        iconTheme: IconThemeData(color: Colors.white.withOpacity(0.8)),
+        iconTheme: IconThemeData(color: Colors.white.withValues(alpha: 0.8)),
         surfaceTintColor: Colors.transparent,
       ),
       cardTheme: CardThemeData(
-        color: surfaceColor.withOpacity(0.8),
+        color: surfaceColor.withValues(alpha: 0.8),
         elevation: 2,
-        shadowColor: AppConstants.primaryGreen.withOpacity(0.05),
+        shadowColor: AppConstants.primaryGreen.withValues(alpha: 0.05),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14),
           side: BorderSide(
-            color: Colors.white.withOpacity(0.06),
+            color: Colors.white.withValues(alpha: 0.06),
           ),
         ),
       ),
@@ -60,7 +60,7 @@ class AppTheme {
           backgroundColor: AppConstants.primaryGreen,
           foregroundColor: Colors.black,
           elevation: 2,
-          shadowColor: AppConstants.primaryGreen.withOpacity(0.3),
+          shadowColor: AppConstants.primaryGreen.withValues(alpha: 0.3),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
@@ -104,13 +104,13 @@ class AppTheme {
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide(
-            color: Colors.white.withOpacity(0.08),
+            color: Colors.white.withValues(alpha: 0.08),
           ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide(
-            color: Colors.white.withOpacity(0.08),
+            color: Colors.white.withValues(alpha: 0.08),
           ),
         ),
         focusedBorder: OutlineInputBorder(
@@ -123,25 +123,25 @@ class AppTheme {
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide(
-            color: Colors.red.withOpacity(0.5),
+            color: Colors.red.withValues(alpha: 0.5),
           ),
         ),
         hintStyle: GoogleFonts.inter(
-          color: Colors.white.withOpacity(0.35),
+          color: Colors.white.withValues(alpha: 0.35),
         ),
         labelStyle: GoogleFonts.inter(
-          color: Colors.white.withOpacity(0.5),
+          color: Colors.white.withValues(alpha: 0.5),
           fontWeight: FontWeight.w500,
         ),
-        prefixIconColor: Colors.white.withOpacity(0.5),
-        suffixIconColor: Colors.white.withOpacity(0.5),
+        prefixIconColor: Colors.white.withValues(alpha: 0.5),
+        suffixIconColor: Colors.white.withValues(alpha: 0.5),
       ),
       listTileTheme: const ListTileThemeData(
         textColor: Colors.white,
         iconColor: AppConstants.primaryGreen,
       ),
       dividerTheme: DividerThemeData(
-        color: Colors.white.withOpacity(0.06),
+        color: Colors.white.withValues(alpha: 0.06),
         thickness: 1,
       ),
       snackBarTheme: SnackBarThemeData(
@@ -150,13 +150,13 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
           side: BorderSide(
-            color: AppConstants.primaryGreen.withOpacity(0.15),
+            color: AppConstants.primaryGreen.withValues(alpha: 0.15),
           ),
         ),
         elevation: 4,
       ),
       bottomSheetTheme: BottomSheetThemeData(
-        backgroundColor: surfaceColor.withOpacity(0.95),
+        backgroundColor: surfaceColor.withValues(alpha: 0.95),
         modalBarrierColor: Colors.black54,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -168,7 +168,7 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
           side: BorderSide(
-            color: Colors.white.withOpacity(0.08),
+            color: Colors.white.withValues(alpha: 0.08),
           ),
         ),
         elevation: 8,
@@ -178,7 +178,7 @@ class AppTheme {
           fontWeight: FontWeight.w600,
         ),
         contentTextStyle: GoogleFonts.inter(
-          color: Colors.white.withOpacity(0.7),
+          color: Colors.white.withValues(alpha: 0.7),
           fontSize: 14,
         ),
       ),
@@ -188,7 +188,7 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
           side: BorderSide(
-            color: Colors.white.withOpacity(0.08),
+            color: Colors.white.withValues(alpha: 0.08),
           ),
         ),
         textStyle: GoogleFonts.inter(

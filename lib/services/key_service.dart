@@ -13,7 +13,7 @@ import '../utils/ssh_key_encoder.dart';
 /// Service for generating, importing, storing, and managing SSH keys.
 class KeyService extends ChangeNotifier {
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage(
-    aOptions: AndroidOptions(encryptedSharedPreferences: true),
+    aOptions: AndroidOptions(),
   );
   final Box<StoredKeyPair> _keysBox;
 

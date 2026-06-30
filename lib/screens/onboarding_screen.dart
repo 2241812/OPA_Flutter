@@ -76,7 +76,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   child: Text(
                     'Skip',
                     style: GoogleFonts.inter(
-                      color: Colors.white.withOpacity(0.5),
+                      color: Colors.white.withValues(alpha: 0.5),
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -105,7 +105,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         decoration: BoxDecoration(
                           color: isActive
                               ? AppConstants.primaryGreen
-                              : Colors.white.withOpacity(0.2),
+                              : Colors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(4),
                         ),
                       );
@@ -158,10 +158,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               height: 120,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppConstants.primaryGreen.withOpacity(0.08),
+                color: AppConstants.primaryGreen.withValues(alpha: 0.08),
                 boxShadow: [
                   BoxShadow(
-                    color: AppConstants.primaryGreen.withOpacity(0.15),
+                    color: AppConstants.primaryGreen.withValues(alpha: 0.15),
                     blurRadius: 40,
                     spreadRadius: 8,
                   ),
@@ -176,7 +176,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 .animate(onPlay: (c) => c.repeat())
                 .shimmer(
                   duration: 2000.ms,
-                  color: AppConstants.primaryGreen.withOpacity(0.2),
+                  color: AppConstants.primaryGreen.withValues(alpha: 0.2),
                 )
                 .scale(
                   begin: const Offset(1, 1),
@@ -200,7 +200,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               'OpenSSH Pocket Agent',
               style: GoogleFonts.inter(
                 fontSize: 16,
-                color: AppConstants.primaryGreen.withOpacity(0.8),
+                color: AppConstants.primaryGreen.withValues(alpha: 0.8),
                 fontWeight: FontWeight.w500,
                 letterSpacing: 1,
               ),
@@ -210,7 +210,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               'Your SSH terminal, in your pocket.',
               style: GoogleFonts.inter(
                 fontSize: 18,
-                color: Colors.white.withOpacity(0.6),
+                color: Colors.white.withValues(alpha: 0.6),
                 height: 1.5,
               ),
               textAlign: TextAlign.center,
@@ -220,7 +220,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               'No telemetry. No cloud. Fully open source.',
               style: GoogleFonts.jetBrainsMono(
                 fontSize: 12,
-                color: Colors.white.withOpacity(0.3),
+                color: Colors.white.withValues(alpha: 0.3),
               ),
               textAlign: TextAlign.center,
             ),
@@ -277,7 +277,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               'Supports password, key-based, or both.',
               style: GoogleFonts.inter(
                 fontSize: 14,
-                color: Colors.white.withOpacity(0.5),
+                color: Colors.white.withValues(alpha: 0.5),
                 height: 1.6,
               ),
               textAlign: TextAlign.center,
@@ -302,8 +302,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           height: 64,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: color.withOpacity(0.1),
-            border: Border.all(color: color.withOpacity(0.3), width: 1.5),
+            color: color.withValues(alpha: 0.1),
+            border: Border.all(color: color.withValues(alpha: 0.3), width: 1.5),
           ),
           child: Icon(icon, color: color, size: 28),
         )
@@ -321,7 +321,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           style: GoogleFonts.inter(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            color: color.withOpacity(0.9),
+            color: color.withValues(alpha: 0.9),
           ),
         )
             .animate()
@@ -337,7 +337,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       height: 20,
       margin: const EdgeInsets.only(left: 31),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
+        color: Colors.white.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(1),
       ),
     );
@@ -358,10 +358,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               height: 100,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppConstants.primaryGreen.withOpacity(0.08),
+                color: AppConstants.primaryGreen.withValues(alpha: 0.08),
                 boxShadow: [
                   BoxShadow(
-                    color: AppConstants.primaryGreen.withOpacity(0.1),
+                    color: AppConstants.primaryGreen.withValues(alpha: 0.1),
                     blurRadius: 30,
                     spreadRadius: 5,
                   ),
@@ -399,7 +399,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               'secure keystore. They never leave your phone.',
               style: GoogleFonts.inter(
                 fontSize: 14,
-                color: Colors.white.withOpacity(0.5),
+                color: Colors.white.withValues(alpha: 0.5),
                 height: 1.6,
               ),
               textAlign: TextAlign.center,
@@ -412,10 +412,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               padding:
                   const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: AppConstants.primaryGreen.withOpacity(0.1),
+                color: AppConstants.primaryGreen.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: AppConstants.primaryGreen.withOpacity(0.2),
+                  color: AppConstants.primaryGreen.withValues(alpha: 0.2),
                 ),
               ),
               child: Row(
@@ -467,10 +467,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               height: 100,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: const Color(0xFFFFAB40).withOpacity(0.08),
+                color: const Color(0xFFFFAB40).withValues(alpha: 0.08),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFFFFAB40).withOpacity(0.1),
+                    color: const Color(0xFFFFAB40).withValues(alpha: 0.1),
                     blurRadius: 30,
                     spreadRadius: 5,
                   ),
@@ -508,7 +508,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               'Great for launching agent harnesses or automation tasks.',
               style: GoogleFonts.inter(
                 fontSize: 14,
-                color: Colors.white.withOpacity(0.5),
+                color: Colors.white.withValues(alpha: 0.5),
                 height: 1.6,
               ),
               textAlign: TextAlign.center,
@@ -521,10 +521,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               width: double.infinity,
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppConstants.surfaceDark.withOpacity(0.6),
+                color: AppConstants.surfaceDark.withValues(alpha: 0.6),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.06),
+                  color: Colors.white.withValues(alpha: 0.06),
                 ),
               ),
               child: Column(
@@ -534,7 +534,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     '\$ python ~/agents/start.py --auto',
                     style: GoogleFonts.jetBrainsMono(
                       fontSize: 12,
-                      color: AppConstants.primaryGreen.withOpacity(0.8),
+                      color: AppConstants.primaryGreen.withValues(alpha: 0.8),
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -553,7 +553,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         'Agent running on port 8080',
                         style: GoogleFonts.jetBrainsMono(
                           fontSize: 11,
-                          color: Colors.white.withOpacity(0.4),
+                          color: Colors.white.withValues(alpha: 0.4),
                         ),
                       ),
                     ],
